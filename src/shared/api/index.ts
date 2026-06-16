@@ -1,1 +1,1 @@
-// shared/api
+export { apiInstance } from './instance';
