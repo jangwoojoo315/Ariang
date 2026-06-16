@@ -1,1 +1,1 @@
-// entities layer
+export * from './spot';
