@@ -29,7 +29,7 @@ function SettingsRow({ left, right }: { left: React.ReactNode; right: React.Reac
 
 function SettingsSection({ title, children, px }: { title:string; children:React.ReactNode; px:number }) {
   return (
-    <div style={{ padding:`0 ${px}px`, marginBottom:20 }}>
+    <div style={{ paddingTop:0, paddingRight:px, paddingBottom:0, paddingLeft:px, marginBottom:20 }}>
       <div style={{ fontSize:12, fontWeight:700, color:'var(--text2)', marginBottom:8, letterSpacing:0.5 }}>{title}</div>
       <SettingsCard>{children}</SettingsCard>
     </div>
@@ -77,11 +77,11 @@ export function SettingsScreen({ user, onUpdateUser }: Props) {
 
   return (
     <div style={{ height:'100%', overflowY:'auto', paddingBottom: isMobile ? 80 : 24 }} className="no-scroll">
-      <div style={{ padding:`24px ${px}px 0` }}>
+      <div style={{ paddingTop:24, paddingRight:px, paddingBottom:0, paddingLeft:px }}>
         <div style={{ fontWeight:800, fontSize:22, marginBottom:20 }}>설정 ⚙️</div>
       </div>
 
-      <div style={{ padding:`0 ${px}px`, marginBottom:8 }}>
+      <div style={{ paddingTop:0, paddingRight:px, paddingBottom:0, paddingLeft:px, marginBottom:8 }}>
         <SettingsCard>
           <div style={{ display:'flex', alignItems:'center', gap:14, padding:'4px 0 12px' }}>
             <div style={{ width:56, height:56, borderRadius:28, background:'linear-gradient(135deg, var(--primary), var(--secondary))', display:'flex', alignItems:'center', justifyContent:'center', fontSize:28 }}>🌿</div>
@@ -139,7 +139,7 @@ export function SettingsScreen({ user, onUpdateUser }: Props) {
         ))}
       </SettingsSection>
 
-      <div style={{ padding:`0 ${px}px`, marginBottom:24 }}>
+      <div style={{ paddingTop:0, paddingRight:px, paddingBottom:0, paddingLeft:px, marginBottom:24 }}>
         <div style={{ background:'var(--tag-bg)', borderRadius:14, padding:'12px 16px' }}>
           <div style={{ fontSize:11, color:'var(--text2)', lineHeight:1.7 }}>
             📊 생태관광지 데이터: 한국관광공사 TourAPI<br />
@@ -149,7 +149,7 @@ export function SettingsScreen({ user, onUpdateUser }: Props) {
         </div>
       </div>
 
-      <div style={{ padding:`0 ${px}px`, paddingBottom:20 }}>
+      <div style={{ paddingTop:0, paddingRight:px, paddingBottom:20, paddingLeft:px }}>
         <button style={{ width:'100%', padding:'13px 0', borderRadius:14, border:'1.5px solid #F0D0D0', color:'#E57373', fontWeight:700, fontSize:15, cursor:'pointer' }}>
           로그아웃
         </button>

@@ -1,6 +1,6 @@
 'use client';
-import { useState, useEffect } from 'react';
-import { OnboardingScreen, HomeScreen } from '@/views/home';
+import { useState } from 'react';
+import { HomeScreen } from '@/views/home';
 import { SearchScreen } from '@/views/search';
 import { DetailSheet, BundleDetailSheet } from '@/views/detail';
 import { TripsScreen } from '@/views/trips';
@@ -10,7 +10,7 @@ import { useWindowWidth } from '@/shared/lib';
 import { DEFAULT_CHECKLISTS } from '@/entities/spot';
 import type { SpotOrFestival, Bundle, Trip, UserProfile } from '@/shared/types';
 
-type Screen = 'onboarding' | 'home' | 'search' | 'bundle' | 'trips' | 'settings';
+type Screen = 'home' | 'search' | 'bundle' | 'trips' | 'settings';
 
 const NAV = [
   { key:'home'     as Screen, label:'홈' },
@@ -20,36 +20,22 @@ const NAV = [
   { key:'settings' as Screen, label:'설정' },
 ];
 
-function loadTrips(): Trip[] {
-  if (typeof window === 'undefined') return [];
-  try { return JSON.parse(localStorage.getItem('iarng_trips') || '[]'); } catch { return []; }
-}
 
 export function AriangApp() {
-  const [screen, setScreen] = useState<Screen>('onboarding' as Screen);
+  const [screen, setScreen] = useState<Screen>('home');
   const [user, setUser] = useState<UserProfile | null>(null);
   const [selectedItem, setSelectedItem] = useState<SpotOrFestival | null>(null);
   const [selectedBundle, setSelectedBundle] = useState<Bundle | null>(null);
-  const [savedTrips, setSavedTrips] = useState<Trip[]>(loadTrips);
+  const [savedTrips, setSavedTrips] = useState<Trip[]>([]);
   const width = useWindowWidth();
   const isDesktop = width >= 768;
 
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('iarng_trips', JSON.stringify(savedTrips));
-    }
-  }, [savedTrips]);
-
-  const handleSaveTrip = (item: SpotOrFestival, date: string) => {
+const handleSaveTrip = (item: SpotOrFestival, date: string) => {
     const defaultItems = (DEFAULT_CHECKLISTS[item.theme] || DEFAULT_CHECKLISTS.forest).map(label => ({ label, checked: false }));
     const trip: Trip = { id: Date.now(), itemId: item.id, item, date, checklist: defaultItems };
     setSavedTrips(ts => [...ts, trip]);
     setScreen('trips');
   };
-
-  if ((screen as string) === 'onboarding') return (
-    <OnboardingScreen onComplete={profile => { setUser(profile); setScreen('home'); }} />
-  );
 
   return (
     <div style={{ display:'flex', height:'100vh', width:'100%', overflow:'hidden' }}>
