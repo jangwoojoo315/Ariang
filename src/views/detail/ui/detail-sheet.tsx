@@ -8,9 +8,6 @@ import type { SpotOrFestival, Trip } from '@/shared/types';
 function IconStroller({ size=22, color='currentColor' }: { size?:number; color?:string }) {
   return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="8" cy="19" r="2"/><circle cx="18" cy="19" r="2"/><path d="M4 4h2l3.5 9H17a2 2 0 0 0 2-2V8H9"/><path d="M9 13H5l-1-4"/></svg>;
 }
-function IconMilk({ size=22, color='currentColor' }: { size?:number; color?:string }) {
-  return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M8 2h8l1 4H7L8 2z"/><path d="M7 6v14a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V6"/><path d="M11 11h2M11 15h2"/></svg>;
-}
 function IconCar({ size=22, color='currentColor' }: { size?:number; color?:string }) {
   return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 17H3a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="6" rx="1"/><path d="M6 9l1.5-5h9L18 9"/></svg>;
 }
@@ -167,10 +164,9 @@ export function DetailSheet({ item, onClose, onSaveTrip, savedTrips }: { item: S
             </div>
             <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:10 }}>
               {[
-                { label:'유아차', Icon:IconStroller, ok:item.stroller, detail:item.stroller?'전 구간 가능':'비권장' },
-                { label:'수유실', Icon:IconMilk,     ok:item.nursing,  detail:item.nursing?'내부 운영':'없음' },
-                { label:'주차장', Icon:IconCar,      ok:item.parking,  detail:item.parking?'무료 주차':'없음' },
-                { label:'배려 화장실', Icon:IconAccessible, ok:item.accessible, detail:item.accessible?'이용 가능':'없음' },
+                { label:'유아차 대여', Icon:IconStroller, ok:item.stroller, detail:item.stroller?'대여 가능':'대여 없음' },
+                { label:'주차', Icon:IconCar,      ok:item.parking,  detail:item.parking?'주차 가능':'주차 없음' },
+                { label:'화장실', Icon:IconAccessible, ok:item.accessible, detail:item.accessible?'이용 가능':'없음' },
               ].map(({ label, Icon, ok, detail }) => (
                 <div key={label} style={{ background: ok ? '#fff' : '#F8F8F8', borderRadius:12, padding:'10px 12px', border:`1px solid ${ok ? 'var(--border)' : '#EDEDED'}`, display:'flex', alignItems:'center', gap:8 }}>
                   <div style={{ width:36, height:36, borderRadius:10, flexShrink:0, background: ok ? 'var(--tag-bg)' : '#EFEFEF', display:'flex', alignItems:'center', justifyContent:'center' }}>
