@@ -9,7 +9,7 @@ export interface ThemeInfo {
 }
 
 export interface Spot {
-  id: number;
+  id: string;
   name: string;
   region: string;
   theme: Theme;
@@ -35,7 +35,7 @@ export interface Spot {
 }
 
 export interface Festival {
-  id: number;
+  id: string;
   name: string;
   region: string;
   theme: Theme;
@@ -91,7 +91,7 @@ export interface ChecklistItem {
 
 export interface Trip {
   id: number;
-  itemId: number;
+  itemId: string;
   item: SpotOrFestival;
   date: string;
   checklist: ChecklistItem[];

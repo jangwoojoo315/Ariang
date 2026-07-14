@@ -48,7 +48,7 @@ const SEOUL_EXAMPLE: Bundle = {
 interface Props {
   onSelectBundle: (bundle: Bundle) => void;
   onSelectItem: (item: SpotOrFestival) => void;
-  savedTrips: { itemId: number }[];
+  savedTrips: { itemId: string }[];
   onSaveTrip: (item: SpotOrFestival, date: string) => void;
 }
 

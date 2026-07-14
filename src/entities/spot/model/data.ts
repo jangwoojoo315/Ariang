@@ -18,7 +18,7 @@ export const SEASONS: Record<Season, string> = {
 
 export const SPOTS: Spot[] = [
   {
-    id:1, name:'순천만 국가정원', region:'전남', theme:'wetland',
+    id:'1', name:'순천만 국가정원', region:'전남', theme:'wetland',
     img:'https://images.unsplash.com/photo-1501854140801-50d01698950b?w=600&q=80',
     description:'세계 최대 규모의 갈대밭과 철새 도래지. 탐조 프로그램으로 아이들이 자연 생태계를 직접 관찰할 수 있어요.',
     stroller:true, nursing:true, parking:true, accessible:true, hasPrograms:true,
@@ -30,7 +30,7 @@ export const SPOTS: Spot[] = [
     isNew:false, distance:3.2,
   },
   {
-    id:2, name:'제주 곶자왈 생태숲', region:'제주', theme:'forest',
+    id:'2', name:'제주 곶자왈 생태숲', region:'제주', theme:'forest',
     img:'https://images.unsplash.com/photo-1448375240586-882707db888b?w=600&q=80',
     description:'화산암반 위에 형성된 독특한 열대·온대 식물의 공존 지대. 용암길을 직접 걸으며 탐험할 수 있어요.',
     stroller:false, nursing:true, parking:true, accessible:false, hasPrograms:true,
@@ -42,7 +42,7 @@ export const SPOTS: Spot[] = [
     isNew:false, distance:12.1,
   },
   {
-    id:3, name:'서울 강서습지생태공원', region:'서울', theme:'wetland',
+    id:'3', name:'서울 강서습지생태공원', region:'서울', theme:'wetland',
     img:'https://images.unsplash.com/photo-1465146344425-f00d5f5c8f07?w=600&q=80',
     description:'한강 하류의 자연 습지 생태계. 도심에서 가장 가깝게 자연을 만날 수 있는 곳으로, 모든 연령 접근 가능.',
     stroller:true, nursing:true, parking:true, accessible:true, hasPrograms:true,
@@ -54,7 +54,7 @@ export const SPOTS: Spot[] = [
     isNew:false, distance:0.8,
   },
   {
-    id:4, name:'국립생태원', region:'충남', theme:'wildlife',
+    id:'4', name:'국립생태원', region:'충남', theme:'wildlife',
     img:'https://images.unsplash.com/photo-1474511320723-9a56873867b5?w=600&q=80',
     description:'세계 5대 기후대 생태계를 한 곳에서. 에코리움 실내관으로 날씨 상관없이 체험 가능해 아이들에게 최고 인기.',
     stroller:true, nursing:true, parking:true, accessible:true, hasPrograms:true,
@@ -66,7 +66,7 @@ export const SPOTS: Spot[] = [
     isNew:false, distance:8.5,
   },
   {
-    id:5, name:'대관령 양떼목장', region:'강원', theme:'farm',
+    id:'5', name:'대관령 양떼목장', region:'강원', theme:'farm',
     img:'https://images.unsplash.com/photo-1500595046743-cd271d694d30?w=600&q=80',
     description:'구름 위의 초원에서 양 먹이주기 체험. 드넓은 목초지가 아이들의 뛰어놀기 공간이 되어줘요.',
     stroller:false, nursing:false, parking:true, accessible:false, hasPrograms:true,
@@ -78,7 +78,7 @@ export const SPOTS: Spot[] = [
     isNew:false, distance:15.3,
   },
   {
-    id:6, name:'울진 금강소나무숲길', region:'경북', theme:'forest',
+    id:'6', name:'울진 금강소나무숲길', region:'경북', theme:'forest',
     img:'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=600&q=80',
     description:'수령 500년 이상의 금강소나무 군락. 산림청 숲 해설가와 함께하는 가이드 투어로 예약 필수.',
     stroller:false, nursing:false, parking:true, accessible:false, hasPrograms:true,
@@ -90,7 +90,7 @@ export const SPOTS: Spot[] = [
     isNew:true, distance:42.1,
   },
   {
-    id:7, name:'진도 신비의 바닷길', region:'전남', theme:'ocean',
+    id:'7', name:'진도 신비의 바닷길', region:'전남', theme:'ocean',
     img:'https://images.unsplash.com/photo-1505118380757-91f5f5632de0?w=600&q=80',
     description:'1년에 몇 번 조수간만의 차로 바닷길이 열리는 신비로운 현상. 아이들이 바다 바닥을 직접 걸을 수 있어요.',
     stroller:false, nursing:false, parking:true, accessible:false, hasPrograms:false,
@@ -102,7 +102,7 @@ export const SPOTS: Spot[] = [
     isNew:false, distance:28.7,
   },
   {
-    id:8, name:'철원 두루미 탐조지', region:'강원', theme:'wildlife',
+    id:'8', name:'철원 두루미 탐조지', region:'강원', theme:'wildlife',
     img:'https://images.unsplash.com/photo-1490718720478-364a07a997cd?w=600&q=80',
     description:'천연기념물 두루미 가족을 가장 가까이서 볼 수 있는 탐조 명소. 망원경 체험 제공.',
     stroller:true, nursing:false, parking:true, accessible:true, hasPrograms:true,
@@ -114,7 +114,7 @@ export const SPOTS: Spot[] = [
     isNew:false, distance:35.4,
   },
   {
-    id:9, name:'고흥 우주천문과학관', region:'전남', theme:'astronomy',
+    id:'9', name:'고흥 우주천문과학관', region:'전남', theme:'astronomy',
     img:'https://images.unsplash.com/photo-1419242902214-272b3f66ee7a?w=600&q=80',
     description:'나로우주센터 인근 우주 테마 과학관. 로켓 발사 장면을 볼 수 있는 유일한 공간.',
     stroller:true, nursing:true, parking:true, accessible:true, hasPrograms:true,
@@ -126,7 +126,7 @@ export const SPOTS: Spot[] = [
     isNew:true, distance:55.2,
   },
   {
-    id:10, name:'화순 고인돌 유적지', region:'전남', theme:'geology',
+    id:'10', name:'화순 고인돌 유적지', region:'전남', theme:'geology',
     img:'https://images.unsplash.com/photo-1510797215324-95aa89f43c33?w=600&q=80',
     description:'유네스코 세계문화유산 고인돌 군락. 선사시대 이야기로 아이들의 역사 상상력을 자극해요.',
     stroller:true, nursing:false, parking:true, accessible:true, hasPrograms:true,
@@ -141,7 +141,7 @@ export const SPOTS: Spot[] = [
 
 export const FESTIVALS: Festival[] = [
   {
-    id:101, name:'양평 들꽃 축제', region:'경기', theme:'farm',
+    id:'101', name:'양평 들꽃 축제', region:'경기', theme:'farm',
     img:'https://images.unsplash.com/photo-1462275646964-a0e3386b89fa?w=600&q=80',
     description:'5월 봄을 가득 채우는 야생화와 들꽃 축제. 꽃 묘종 가져가기, 압화 만들기 등 아이들 프로그램 풍성.',
     stroller:true, nursing:true, parking:true, accessible:true, hasPrograms:true,
@@ -150,7 +150,7 @@ export const FESTIVALS: Festival[] = [
     season:['spring'], isNew:false, distance:6.3, admission:'무료',
   },
   {
-    id:102, name:'창녕 우포늪 생태 축제', region:'경남', theme:'wetland',
+    id:'102', name:'창녕 우포늪 생태 축제', region:'경남', theme:'wetland',
     img:'https://images.unsplash.com/photo-1502082553048-f009c37129b9?w=600&q=80',
     description:'국내 최대 내륙 습지 우포늪의 봄을 맞이하는 축제. 가시연꽃 관찰, 민물고기 잡기 체험.',
     stroller:true, nursing:false, parking:true, accessible:false, hasPrograms:true,
@@ -159,7 +159,7 @@ export const FESTIVALS: Festival[] = [
     season:['spring'], isNew:false, distance:18.4, admission:'무료',
   },
   {
-    id:103, name:'제주 유채꽃 축제', region:'제주', theme:'farm',
+    id:'103', name:'제주 유채꽃 축제', region:'제주', theme:'farm',
     img:'https://images.unsplash.com/photo-1522748906645-95d8adfd52c7?w=600&q=80',
     description:'제주도를 노랗게 물들이는 유채꽃 물결. 산방산을 배경으로 봄 나들이의 정수.',
     stroller:true, nursing:true, parking:true, accessible:true, hasPrograms:false,
@@ -167,7 +167,7 @@ export const FESTIVALS: Festival[] = [
     season:['spring'], isNew:false, distance:45.0, admission:'무료',
   },
   {
-    id:104, name:'홍천 자연 생태 어린이 축제', region:'강원', theme:'forest',
+    id:'104', name:'홍천 자연 생태 어린이 축제', region:'강원', theme:'forest',
     img:'https://images.unsplash.com/photo-1516627145497-ae6968895b74?w=600&q=80',
     description:'어린이를 위해 설계된 생태 체험 축제. 텃밭 농사 체험, 동물 먹이주기, 숲속 어드벤처.',
     stroller:true, nursing:true, parking:true, accessible:true, hasPrograms:true,
@@ -176,7 +176,7 @@ export const FESTIVALS: Festival[] = [
     season:['spring'], isNew:true, distance:24.1, admission:'어린이 5,000원 / 성인 무료',
   },
   {
-    id:105, name:'고창 청보리밭 축제', region:'전북', theme:'farm',
+    id:'105', name:'고창 청보리밭 축제', region:'전북', theme:'farm',
     img:'https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=600&q=80',
     description:'4–5월 청보리가 물결치는 학원농장의 축제. 바람에 흔들리는 보리밭을 거니는 경험.',
     stroller:true, nursing:false, parking:true, accessible:false, hasPrograms:false,
@@ -184,7 +184,7 @@ export const FESTIVALS: Festival[] = [
     season:['spring'], isNew:false, distance:32.6, admission:'성인 3,000원 / 어린이 1,500원',
   },
   {
-    id:106, name:'함평 나비 축제', region:'전남', theme:'wildlife',
+    id:'106', name:'함평 나비 축제', region:'전남', theme:'wildlife',
     img:'https://images.unsplash.com/photo-1444927714506-8492d94b4e3d?w=600&q=80',
     description:'살아있는 나비와 함께하는 국내 유일의 나비 생태 축제. 나비 표본 만들기, 누에고치 관찰.',
     stroller:true, nursing:true, parking:true, accessible:true, hasPrograms:true,
@@ -193,7 +193,7 @@ export const FESTIVALS: Festival[] = [
     season:['spring'], isNew:false, distance:15.8, admission:'무료',
   },
   {
-    id:107, name:'영덕 해양 생태 수산 축제', region:'경북', theme:'ocean',
+    id:'107', name:'영덕 해양 생태 수산 축제', region:'경북', theme:'ocean',
     img:'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=600&q=80',
     description:'동해 바닷가에서 즐기는 수산 생태 체험. 해양 생물 관찰, 조개잡이, 갯벌 체험.',
     stroller:false, nursing:false, parking:true, accessible:false, hasPrograms:true,
@@ -202,7 +202,7 @@ export const FESTIVALS: Festival[] = [
     season:['spring'], isNew:false, distance:48.2, admission:'무료',
   },
   {
-    id:108, name:'별빛 가족 캠프 (화천)', region:'강원', theme:'astronomy',
+    id:'108', name:'별빛 가족 캠프 (화천)', region:'강원', theme:'astronomy',
     img:'https://images.unsplash.com/photo-1464852045489-bccb7d17fe39?w=600&q=80',
     description:'광공해 없는 화천에서 즐기는 별자리 관측 가족 캠프. 천문대 해설사와 함께하는 별 이야기.',
     stroller:false, nursing:false, parking:true, accessible:false, hasPrograms:true,
@@ -211,7 +211,7 @@ export const FESTIVALS: Festival[] = [
     season:['summer','fall'], isNew:true, distance:38.9, admission:'가족권 50,000원',
   },
   {
-    id:109, name:'담양 대나무 생태 축제', region:'전남', theme:'forest',
+    id:'109', name:'담양 대나무 생태 축제', region:'전남', theme:'forest',
     img:'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&q=80',
     description:'대나무 숲 사이를 거니는 시원한 여름 축제. 대나무 공예, 죽마 타기 등 전통 체험.',
     stroller:true, nursing:true, parking:true, accessible:true, hasPrograms:true,
@@ -220,7 +220,7 @@ export const FESTIVALS: Festival[] = [
     season:['summer'], isNew:false, distance:11.3, admission:'성인 2,000원 / 어린이 무료',
   },
   {
-    id:110, name:'서천 갯벌 생태 축제', region:'충남', theme:'ocean',
+    id:'110', name:'서천 갯벌 생태 축제', region:'충남', theme:'ocean',
     img:'https://images.unsplash.com/photo-1494791368093-85217fbbf8de?w=600&q=80',
     description:'유네스코 세계자연유산 갯벌에서 직접 체험. 갯벌 생물 관찰과 조개 캐기로 아이들에게 인기.',
     stroller:false, nursing:true, parking:true, accessible:false, hasPrograms:true,
@@ -232,7 +232,7 @@ export const FESTIVALS: Festival[] = [
 
 export const BUNDLES: Bundle[] = [
   {
-    id:201, title:'봄 생태 코스 🌸',
+    id:'201', title:'봄 생태 코스 🌸',
     theme:'wetland',
     distance:'22km', duration:'당일치기',
     stroller:true, region:'서울·경기',
@@ -244,7 +244,7 @@ export const BUNDLES: Bundle[] = [
     ],
   },
   {
-    id:202, title:'제주 자연 탐험 🌺',
+    id:'202', title:'제주 자연 탐험 🌺',
     theme:'forest',
     distance:'15km', duration:'1박 2일',
     stroller:false, region:'제주',
@@ -258,7 +258,7 @@ export const BUNDLES: Bundle[] = [
     ],
   },
   {
-    id:203, title:'전남 생태 완전 정복 🌿',
+    id:'203', title:'전남 생태 완전 정복 🌿',
     theme:'wildlife',
     distance:'45km', duration:'1박 2일',
     stroller:true, region:'전남',
