@@ -1,0 +1,226 @@
+openapi: 3.0.0
+info:
+  title: 아이랑 - 홈 화면 API
+  version: 1.0
+
+servers:
+  - url: http://localhost:8080
+    description: 개발 서버
+
+paths:
+  /api/ecotourism:
+    get:
+      summary: 인기 역사관광지 Top5
+      operationId: getHistoryTourTop5
+      tags:
+        - Home
+      responses:
+        '200':
+          description: 성공
+          content:
+            application/json:
+              schema:
+                type: array
+                maxItems: 5
+                items:
+                  $ref: '#/components/schemas/TourSpot'
+
+  /api/experience:
+    get:
+      summary: 인기 체험관광지 Top5
+      operationId: getExperienceTourTop5
+      tags:
+        - Home
+      responses:
+        '200':
+          description: 성공
+          content:
+            application/json:
+              schema:
+                type: array
+                maxItems: 5
+                items:
+                  $ref: '#/components/schemas/TourSpot'
+
+  /api/nature:
+    get:
+      summary: 인기 자연관광지 Top5
+      operationId: getNatureTourTop5
+      tags:
+        - Home
+      responses:
+        '200':
+          description: 성공
+          content:
+            application/json:
+              schema:
+                type: array
+                maxItems: 5
+                items:
+                  $ref: '#/components/schemas/TourSpot'
+
+  /api/recently-opened:
+    get:
+      summary: 새로 생긴 곳 (30일 이내)
+      operationId: getRecentlyOpened
+      tags:
+        - Home
+      responses:
+        '200':
+          description: 성공
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/RecentPlace'
+
+components:
+  schemas:
+
+    Region:
+      type: string
+      enum:
+        - SEOUL
+        - BUSAN
+        - DAEGU
+        - INCHEON
+        - GWANGJU
+        - DAEJEON
+        - ULSAN
+        - SEJONG
+        - GYEONGGI
+        - GANGWON
+        - CHUNGBUK
+        - CHUNGNAM
+        - JEONBUK
+        - JEONNAM
+        - GYEONGBUK
+        - GYEONGNAM
+        - JEJU
+
+    TourSpot:
+      type: object
+      required:
+        - name
+        - id
+        - region
+        - imgUrl
+        - isStrollerRental
+        - isPark
+        - isToilet
+        - operatingHours
+        - price
+        - latitude
+        - longitude
+      properties:
+        name:
+          type: string
+          example: "경복궁"
+        id:
+          type: string
+          example: "264337"
+        region:
+          $ref: '#/components/schemas/Region'
+          example: "SEOUL"
+        imgUrl:
+          type: string
+          nullable: true
+          example: "http://tong.visitkorea.or.kr/cms/resource/..."
+        isStrollerRental:
+          type: boolean
+          example: true
+        isPark:
+          type: boolean
+          example: true
+        isToilet:
+          type: boolean
+          example: true
+        operatingHours:
+          type: string
+          nullable: true
+          example: "09:00~18:00"
+        price:
+          type: string
+          nullable: true
+          example: "무료"
+        latitude:
+          type: number
+          format: double
+          example: 37.5796
+        longitude:
+          type: number
+          format: double
+          example: 126.9770
+
+    RecentPlace:
+      type: object
+      required:
+        - name
+        - id
+        - region
+        - imgUrl
+        - isStrollerRental
+        - isPark
+        - isToilet
+        - isEcoTourism
+        - operatingHours
+        - price
+        - latitude
+        - longitude
+      properties:
+        name:
+          type: string
+          example: "새로운 생태관광지"
+        id:
+          type: string
+          example: "2019720"
+        region:
+          $ref: '#/components/schemas/Region'
+          example: "GANGWON"
+        imgUrl:
+          type: string
+          nullable: true
+        isStrollerRental:
+          type: boolean
+          example: false
+        isPark:
+          type: boolean
+          example: true
+        isToilet:
+          type: boolean
+          example: true
+        isEcoTourism:
+          type: boolean
+          description: "생태관광지면 true, 축제면 false"
+          example: true
+        operatingHours:
+          type: string
+          nullable: true
+          example: "09:00~18:00"
+        price:
+          type: string
+          nullable: true
+          example: "무료"
+        latitude:
+          type: number
+          format: double
+          example: 36.4528
+        longitude:
+          type: number
+          format: double
+          example: 127.1216
+        startAt:
+          type: string
+          nullable: true
+          description: "축제일 때만 (YYYYMMDD)"
+          example: "20260701"
+        endAt:
+          type: string
+          nullable: true
+          description: "축제일 때만 (YYYYMMDD)"
+          example: "20260705"
+
+tags:
+  - name: Home
+    description: 홈 화면 API
