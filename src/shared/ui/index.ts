@@ -3,6 +3,7 @@ export * from './placeholder-img';
 export * from './theme-chip';
 export * from './access-badges';
 export * from './spot-card';
+export * from './tour-spot-card';
 export * from './section-header';
 export * from './bottom-sheet';
 export * from './modal';
