@@ -1,5 +1,12 @@
-export type Season = 'spring' | 'summer' | 'fall' | 'winter' | 'year-round';
-export type Theme = 'forest' | 'wetland' | 'ocean' | 'farm' | 'wildlife' | 'astronomy' | 'geology';
+export type Season = "spring" | "summer" | "fall" | "winter" | "year-round";
+export type Theme =
+  | "forest"
+  | "wetland"
+  | "ocean"
+  | "farm"
+  | "wildlife"
+  | "astronomy"
+  | "geology";
 
 export interface ThemeInfo {
   label: string;
@@ -60,10 +67,10 @@ export interface Festival {
   safety?: string;
 }
 
-export type SpotOrFestival = Spot | Festival;
+export type SpotOrFestival = Spot;
 
 export interface CourseStop {
-  type: 'spot' | 'festival' | 'meal' | 'stay';
+  type: "spot" | "festival" | "meal" | "stay";
   item?: SpotOrFestival;
   order: number;
   tip?: string;
@@ -108,11 +115,10 @@ export interface UserProfile {
 
 export interface FilterState {
   regions: string[];
-  themes: Theme[];
+  groups: string[];
   stroller: boolean;
   nursing: boolean;
   parking: boolean;
   accessible: boolean;
-  hasPrograms: boolean;
-  season: Season | '';
+  types: string[];
 }
