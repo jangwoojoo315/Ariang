@@ -17,6 +17,6 @@ region?: Region;
  * 관광지 이름
  */
 tourName?: string;
-depth1?: Depth1;
-depth2?: Depth2;
+depth1?: Depth1[];
+depth2?: Depth2[];
 };

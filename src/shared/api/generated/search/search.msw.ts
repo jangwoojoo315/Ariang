@@ -4,62 +4,40 @@
  * 아이랑 - 홈 화면 API
  * OpenAPI spec version: 0.0.1
  */
-import { faker } from "@faker-js/faker";
+import {
+  faker
+} from '@faker-js/faker';
 
-import { HttpResponse, http } from "msw";
-import type { RequestHandlerOptions } from "msw";
+import {
+  HttpResponse,
+  http
+} from 'msw';
+import type {
+  RequestHandlerOptions
+} from 'msw';
 
-import { Region } from "../model";
-import type { TourSpot } from "../model";
+import {
+  Region
+} from '../model';
+import type {
+  TourSpot
+} from '../model';
 
-export const getSearchHistoryTourResponseMock = (): TourSpot[] =>
-  Array.from(
-    { length: faker.number.int({ min: 1, max: 10 }) },
-    (_, i) => i + 1,
-  ).map(() => ({
-    name: faker.string.alpha({ length: { min: 10, max: 20 } }),
-    id: faker.string.alpha({ length: { min: 10, max: 20 } }),
-    region: faker.helpers.arrayElement(Object.values(Region)),
-    imgUrl: faker.helpers.arrayElement([
-      faker.string.alpha({ length: { min: 10, max: 20 } }),
-      null,
-    ]),
-    isStrollerRental: faker.datatype.boolean(),
-    isPark: faker.datatype.boolean(),
-    isToilet: faker.datatype.boolean(),
-    operatingHours: faker.helpers.arrayElement([
-      faker.string.alpha({ length: { min: 10, max: 20 } }),
-      null,
-    ]),
-    price: faker.helpers.arrayElement([
-      faker.string.alpha({ length: { min: 10, max: 20 } }),
-      null,
-    ]),
-    latitude: faker.number.float({ fractionDigits: 2 }),
-    longitude: faker.number.float({ fractionDigits: 2 }),
-  }));
 
-export const getSearchHistoryTourMockHandler = (
-  overrideResponse?:
-    | TourSpot[]
-    | ((
-        info: Parameters<Parameters<typeof http.get>[1]>[0],
-      ) => Promise<TourSpot[]> | TourSpot[]),
-  options?: RequestHandlerOptions,
-) => {
-  return http.get(
-    "*/api/search/history",
-    async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {
-      return HttpResponse.json(
-        overrideResponse !== undefined
-          ? typeof overrideResponse === "function"
-            ? await overrideResponse(info)
-            : overrideResponse
-          : getSearchHistoryTourResponseMock(),
-        { status: 200 },
-      );
-    },
-    options,
-  );
-};
-export const getSearchMock = () => [getSearchHistoryTourMockHandler()];
+export const getSearchHistoryTourResponseMock = (): TourSpot[] => (Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({name: faker.string.alpha({length: {min: 10, max: 20}}), id: faker.string.alpha({length: {min: 10, max: 20}}), region: faker.helpers.arrayElement(Object.values(Region)), imgUrl: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), null]), isStrollerRental: faker.datatype.boolean(), isPark: faker.datatype.boolean(), isToilet: faker.datatype.boolean(), operatingHours: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), null]), price: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), null]), latitude: faker.number.float({fractionDigits: 2}), longitude: faker.number.float({fractionDigits: 2})})))
+
+
+export const getSearchHistoryTourMockHandler = (overrideResponse?: TourSpot[] | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<TourSpot[]> | TourSpot[]), options?: RequestHandlerOptions) => {
+  return http.get('*/api/search/history', async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {
+
+
+    return HttpResponse.json(overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getSearchHistoryTourResponseMock(),
+      { status: 200
+      })
+  }, options)
+}
+export const getSearchMock = () => [
+  getSearchHistoryTourMockHandler()
+]

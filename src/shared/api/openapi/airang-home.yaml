@@ -112,12 +112,16 @@ paths:
           in: query
           required: false
           schema:
-            $ref: '#/components/schemas/Depth1'
+            type: array
+            items:
+              $ref: '#/components/schemas/Depth1'
         - name: depth2
           in: query
           required: false
           schema:
-            $ref: '#/components/schemas/Depth2'
+            type: array
+            items:
+              $ref: '#/components/schemas/Depth2'
       responses:
         '200':
           description: 성공

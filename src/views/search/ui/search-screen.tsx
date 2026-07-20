@@ -76,8 +76,8 @@ export function SearchScreen({ onSelectItem }: Props) {
       const region = LABEL_TO_REGION[filters.regions[0]];
       if (region) params.region = region;
     }
-    if (filters.groups.length === 1) params.depth1 = filters.groups[0] as Depth1;
-    if (filters.types.length === 1) params.depth2 = filters.types[0] as Depth2;
+    if (filters.groups.length) params.depth1 = filters.groups as Depth1[];
+    if (filters.types.length) params.depth2 = filters.types as Depth2[];
     return params;
   }, [query, filters]);
 
