@@ -5,6 +5,9 @@
  * OpenAPI spec version: 0.0.1
  */
 
+export * from './depth1';
+export * from './depth2';
 export * from './recentPlace';
 export * from './region';
+export * from './searchHistoryTourParams';
 export * from './tourSpot';

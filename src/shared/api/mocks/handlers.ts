@@ -5,12 +5,14 @@ import {
   getGetNatureTourTop5MockHandler,
   getGetRecentlyOpenedMockHandler,
 } from '@/shared/api/generated/home/home.msw';
+import { getSearchHistoryTourMockHandler } from '@/shared/api/generated/search/search.msw';
 import {
   historyTourMock,
   experienceTourMock,
   natureTourMock,
   recentlyOpenedMock,
 } from './home-mock-data';
+import { filterHistorySearch } from './search-mock-data';
 
 // orval이 생성한 핸들러 팩토리에 직접 만든 한국 목데이터를 주입한다
 // (faker 랜덤 대신 고정 데이터. generated는 clean:true로 재생성되므로 데이터는 여기서 관리).
@@ -19,4 +21,6 @@ export const handlers: HttpHandler[] = [
   getGetExperienceTourTop5MockHandler(experienceTourMock),
   getGetNatureTourTop5MockHandler(natureTourMock),
   getGetRecentlyOpenedMockHandler(recentlyOpenedMock),
+  // 검색은 query 파라미터에 따라 결과가 달라지므로 요청 URL 기반으로 필터링한다.
+  getSearchHistoryTourMockHandler((info) => filterHistorySearch(info.request.url)),
 ];

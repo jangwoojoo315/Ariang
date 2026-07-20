@@ -75,8 +75,88 @@ paths:
                 items:
                   $ref: '#/components/schemas/RecentPlace'
 
+  /api/search/history:
+    get:
+      summary: 역사관광지 검색
+      operationId: searchHistoryTour
+      tags:
+        - Search
+      parameters:
+        - name: isStrollerRental
+          in: query
+          required: false
+          schema:
+            type: boolean
+        - name: isPark
+          in: query
+          required: false
+          schema:
+            type: boolean
+        - name: isToilet
+          in: query
+          required: false
+          schema:
+            type: boolean
+        - name: region
+          in: query
+          required: false
+          schema:
+            $ref: '#/components/schemas/Region'
+        - name: tourName
+          in: query
+          required: false
+          schema:
+            type: string
+          description: 관광지 이름
+        - name: depth1
+          in: query
+          required: false
+          schema:
+            $ref: '#/components/schemas/Depth1'
+        - name: depth2
+          in: query
+          required: false
+          schema:
+            $ref: '#/components/schemas/Depth2'
+      responses:
+        '200':
+          description: 성공
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TourSpot'
+
 components:
   schemas:
+
+    Depth1:
+      type: string
+      enum:
+        - HS
+        - NA
+        - EX
+
+    Depth2:
+      type: string
+      enum:
+        - HS01
+        - HS02
+        - HS03
+        - HS04
+        - NA01
+        - NA02
+        - NA03
+        - NA04
+        - NA05
+        - EX01
+        - EX02
+        - EX03
+        - EX04
+        - EX05
+        - EX06
+        - EX07
 
     Region:
       type: string
@@ -224,3 +304,5 @@ components:
 tags:
   - name: Home
     description: 홈 화면 API
+  - name: Search
+    description: 검색 API
