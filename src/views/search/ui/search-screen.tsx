@@ -24,6 +24,7 @@ import { REGION_LABELS } from "@/shared/api/region-labels";
 import type {
   SearchHistoryTourParams,
   Depth1,
+  Depth2,
   Region,
 } from "@/shared/api/generated/model";
 import type { SpotOrFestival, FilterState } from "@/shared/types";
@@ -76,6 +77,7 @@ export function SearchScreen({ onSelectItem }: Props) {
       if (region) params.region = region;
     }
     if (filters.groups.length === 1) params.depth1 = filters.groups[0] as Depth1;
+    if (filters.types.length === 1) params.depth2 = filters.types[0] as Depth2;
     return params;
   }, [query, filters]);
 
@@ -435,15 +437,24 @@ const SPOT_TYPE_GROUPS = [
   { key: "EX", label: "체험" },
 ];
 
+// 하위 항목 키는 API Depth2 코드와 동일하게 맞춘다.
 const SPOT_TYPES = {
-  htSite: { label: "역사유적지", group: "HS" },
-  htArtifact: { label: "역사유물", group: "HS" },
-  natMountain: { label: "산", group: "NA" },
-  natSea: { label: "바다", group: "NA" },
-  natAstro: { label: "천문", group: "NA" },
-  expTradition: { label: "전통체험", group: "EX" },
-  expCraft: { label: "공예체험", group: "EX" },
-  expWellness: { label: "웰니스관광", group: "EX" },
+  HS01: { label: "역사유적지", group: "HS" },
+  HS02: { label: "역사유물", group: "HS" },
+  HS03: { label: "종교성지", group: "HS" },
+  HS04: { label: "안보관광지", group: "HS" },
+  NA01: { label: "자연경관(산)", group: "NA" },
+  NA02: { label: "자연경관(하천‧해양)", group: "NA" },
+  NA03: { label: "자연생태", group: "NA" },
+  NA04: { label: "자연공원", group: "NA" },
+  NA05: { label: "기타자연관광", group: "NA" },
+  EX01: { label: "전통체험", group: "EX" },
+  EX02: { label: "공예체험", group: "EX" },
+  EX03: { label: "농.산.어촌 체험", group: "EX" },
+  EX04: { label: "산사체험", group: "EX" },
+  EX05: { label: "웰니스관광", group: "EX" },
+  EX06: { label: "산업관광", group: "EX" },
+  EX07: { label: "기타체험", group: "EX" },
 };
 
 function FilterSheet({
