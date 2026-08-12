@@ -36,12 +36,6 @@ const SEOUL_EXAMPLE: Bundle = {
       desc: "공원 인근 한강변 카페 & 레스토랑. 어린이 메뉴 운영 중.",
       order: 2,
     },
-    {
-      type: "festival",
-      item: FESTIVALS[0],
-      order: 3,
-      tip: "오후 1–4시 사이가 가장 한산해요. 압화 체험은 현장 접수.",
-    },
   ],
 };
 
@@ -107,12 +101,6 @@ export function BundleMakerScreen({ onSelectBundle }: Props) {
               desc: `${spot.region} 지역 향토 음식을 즐겨보세요.`,
               order: 2,
             },
-            {
-              type: "festival",
-              item: festival,
-              order: 3,
-              tip: `${"dateRange" in festival ? festival.dateRange + " 운영" : "방문 전 일정 확인 필수"}`,
-            },
           ],
         });
       });
@@ -169,23 +157,11 @@ export function BundleMakerScreen({ onSelectBundle }: Props) {
           description: `${a.name}과 ${b.name}을 하루에 즐기는 축제 집중 코스예요.`,
           course: [
             {
-              type: "festival",
-              item: a,
-              order: 1,
-              tip: `${"dateRange" in a ? a.dateRange : "날짜 확인 필수"}`,
-            },
-            {
               type: "meal",
               label: "점심 식사",
               icon: "🍱",
               desc: "축제 현장 인근 식당을 이용해보세요.",
               order: 2,
-            },
-            {
-              type: "festival",
-              item: b,
-              order: 3,
-              tip: `${"dateRange" in b ? b.dateRange : "날짜 확인 필수"}`,
             },
           ],
         });
