@@ -6,6 +6,7 @@ import { DetailSheet, BundleDetailSheet } from "@/views/detail";
 import { TripsScreen } from "@/views/trips";
 import { SettingsScreen } from "@/views/settings";
 import { BundleMakerScreen } from "@/views/bundle-maker";
+import { LoginScreen } from "@/views/auth";
 import { useWindowWidth } from "@/shared/lib";
 import { DEFAULT_CHECKLISTS } from "@/entities/spot";
 import type { SpotOrFestival, Bundle, Trip, UserProfile } from "@/shared/types";
@@ -26,6 +27,7 @@ export function AriangApp() {
   const [selectedItem, setSelectedItem] = useState<SpotOrFestival | null>(null);
   const [selectedBundle, setSelectedBundle] = useState<Bundle | null>(null);
   const [savedTrips, setSavedTrips] = useState<Trip[]>([]);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const width = useWindowWidth();
   const isDesktop = width >= 768;
 
@@ -233,23 +235,29 @@ export function AriangApp() {
               height: "100%",
             }}
           >
-            <TripsScreen
-              savedTrips={savedTrips}
-              onUpdateChecklist={(id, items) =>
-                setSavedTrips((ts) =>
-                  ts.map((t) => (t.id === id ? { ...t, checklist: items } : t)),
-                )
-              }
-              onDeleteTrip={(id) =>
-                setSavedTrips((ts) => ts.filter((t) => t.id !== id))
-              }
-              onSelectItem={setSelectedItem}
-              onUpdateDate={(id, date) =>
-                setSavedTrips((ts) =>
-                  ts.map((t) => (t.id === id ? { ...t, date } : t)),
-                )
-              }
-            />
+            {isLoggedIn ? (
+              <TripsScreen
+                savedTrips={savedTrips}
+                onUpdateChecklist={(id, items) =>
+                  setSavedTrips((ts) =>
+                    ts.map((t) =>
+                      t.id === id ? { ...t, checklist: items } : t,
+                    ),
+                  )
+                }
+                onDeleteTrip={(id) =>
+                  setSavedTrips((ts) => ts.filter((t) => t.id !== id))
+                }
+                onSelectItem={setSelectedItem}
+                onUpdateDate={(id, date) =>
+                  setSavedTrips((ts) =>
+                    ts.map((t) => (t.id === id ? { ...t, date } : t)),
+                  )
+                }
+              />
+            ) : (
+              <LoginScreen onLogin={() => setIsLoggedIn(true)} />
+            )}
           </div>
           <div
             style={{
@@ -257,7 +265,11 @@ export function AriangApp() {
               height: "100%",
             }}
           >
-            <SettingsScreen user={user} onUpdateUser={setUser} />
+            {isLoggedIn ? (
+              <SettingsScreen user={user} onUpdateUser={setUser} />
+            ) : (
+              <LoginScreen onLogin={() => setIsLoggedIn(true)} />
+            )}
           </div>
         </div>
 
