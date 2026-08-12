@@ -32,6 +32,8 @@ yarn-error.log*
 
 # env files (can opt-in for committing if needed)
 .env*
+# 목(MSW) 플래그는 비밀값이 아니므로 배포를 위해 커밋한다
+!.env.production
 
 # vercel
 .vercel
