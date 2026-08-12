@@ -1,7 +1,7 @@
 'use client';
 import { useState } from 'react';
 import { Modal, PrimaryBtn } from '@/shared/ui';
-import { useWindowWidth } from '@/shared/lib';
+import { useWindowWidth, clearTokens } from '@/shared/lib';
 import type { UserProfile, ChildProfile } from '@/shared/types';
 
 interface Props { user: UserProfile | null; onUpdateUser: (u: UserProfile) => void; }
@@ -70,6 +70,7 @@ function getAge(birth: string, now: number): string | null {
 export function SettingsScreen({ user, onUpdateUser }: Props) {
   const [notif, setNotif] = useState({ dMinus1:true, dayOf:true, marketing:false });
   const [editingChild, setEditingChild] = useState<number|null>(null);
+  const [confirmLogout, setConfirmLogout] = useState(false);
   const [now] = useState(() => Date.now());
   const width = useWindowWidth();
   const isMobile = width < 768;
@@ -150,7 +151,7 @@ export function SettingsScreen({ user, onUpdateUser }: Props) {
       </div>
 
       <div style={{ paddingTop:0, paddingRight:px, paddingBottom:20, paddingLeft:px }}>
-        <button style={{ width:'100%', padding:'13px 0', borderRadius:14, border:'1.5px solid #F0D0D0', color:'#E57373', fontWeight:700, fontSize:15, cursor:'pointer' }}>
+        <button onClick={() => setConfirmLogout(true)} style={{ width:'100%', padding:'13px 0', borderRadius:14, border:'1.5px solid #F0D0D0', color:'#E57373', fontWeight:700, fontSize:15, cursor:'pointer' }}>
           로그아웃
         </button>
       </div>
@@ -167,6 +168,19 @@ export function SettingsScreen({ user, onUpdateUser }: Props) {
             }}
             onClose={() => setEditingChild(null)}
           />
+        </Modal>
+      )}
+
+      {confirmLogout && (
+        <Modal onClose={() => setConfirmLogout(false)}>
+          <div style={{ fontWeight:800, fontSize:18, marginBottom:8 }}>로그아웃 할까요?</div>
+          <div style={{ fontSize:14, color:'var(--text2)', lineHeight:1.6, marginBottom:20 }}>
+            다시 이용하려면 카카오로 로그인해야 해요.
+          </div>
+          <div style={{ display:'flex', gap:10 }}>
+            <button onClick={() => setConfirmLogout(false)} style={{ flex:1, padding:'12px 0', borderRadius:12, border:'1.5px solid var(--border)', fontSize:14, fontWeight:600, color:'var(--text2)', cursor:'pointer' }}>취소</button>
+            <button onClick={() => { clearTokens(); setConfirmLogout(false); }} style={{ flex:2, padding:'12px 0', borderRadius:12, border:'none', background:'#E57373', color:'#fff', fontSize:14, fontWeight:700, cursor:'pointer' }}>로그아웃</button>
+          </div>
         </Modal>
       )}
     </div>

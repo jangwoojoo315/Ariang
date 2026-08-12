@@ -7,7 +7,7 @@ import { TripsScreen } from "@/views/trips";
 import { SettingsScreen } from "@/views/settings";
 import { BundleMakerScreen } from "@/views/bundle-maker";
 import { LoginScreen } from "@/views/auth";
-import { useWindowWidth } from "@/shared/lib";
+import { useWindowWidth, useIsAuthenticated } from "@/shared/lib";
 import { DEFAULT_CHECKLISTS } from "@/entities/spot";
 import type { SpotOrFestival, Bundle, Trip, UserProfile } from "@/shared/types";
 
@@ -27,7 +27,8 @@ export function AriangApp() {
   const [selectedItem, setSelectedItem] = useState<SpotOrFestival | null>(null);
   const [selectedBundle, setSelectedBundle] = useState<Bundle | null>(null);
   const [savedTrips, setSavedTrips] = useState<Trip[]>([]);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  // 저장된 토큰으로 로그인 세션 복원. 로그인/로그아웃 시 자동 반영된다.
+  const isLoggedIn = useIsAuthenticated();
   const width = useWindowWidth();
   const isDesktop = width >= 768;
 
@@ -256,7 +257,7 @@ export function AriangApp() {
                 }
               />
             ) : (
-              <LoginScreen onLogin={() => setIsLoggedIn(true)} />
+              <LoginScreen />
             )}
           </div>
           <div
@@ -268,7 +269,7 @@ export function AriangApp() {
             {isLoggedIn ? (
               <SettingsScreen user={user} onUpdateUser={setUser} />
             ) : (
-              <LoginScreen onLogin={() => setIsLoggedIn(true)} />
+              <LoginScreen />
             )}
           </div>
         </div>

@@ -1,11 +1,20 @@
 "use client";
 
-interface Props {
-  onLogin: () => void;
-}
-
 // 로그인이 필요한 메뉴(내 여행·설정) 진입 시 노출되는 로그인 게이트 화면.
-export function LoginScreen({ onLogin }: Props) {
+export function LoginScreen() {
+  // 카카오 로그인 시작: 백엔드가 제공하는 OAuth URL로 전체 페이지 이동한다.
+  // (OAuth는 브라우저 리다이렉트가 필요하므로 fetch/axios가 아님)
+  const handleKakaoLogin = () => {
+    const authUrl = process.env.NEXT_PUBLIC_KAKAO_AUTH_URL;
+    if (!authUrl) {
+      console.warn(
+        "NEXT_PUBLIC_KAKAO_AUTH_URL이 설정되지 않았습니다. 백엔드 OAuth URL을 환경변수에 지정하세요.",
+      );
+      return;
+    }
+    window.location.href = authUrl;
+  };
+
   return (
     <div
       style={{
@@ -73,7 +82,7 @@ export function LoginScreen({ onLogin }: Props) {
           SNS 계정으로 시작하기
         </div>
         <button
-          onClick={onLogin}
+          onClick={handleKakaoLogin}
           aria-label="카카오로 시작"
           style={{
             width: "100%",
