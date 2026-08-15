@@ -5,6 +5,7 @@ export const apiInstance = axios.create({
   timeout: 10_000,
   headers: {
     'Content-Type': 'application/json',
+    'X-API-KEY': 'il-deung-haja',
   },
 });
 
