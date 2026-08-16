@@ -27,23 +27,36 @@ apiInstance.interceptors.response.use(
   async (error: AxiosError) => {
     const originalRequest = error.config;
 
-    if (error.response?.status === 401 && originalRequest) {
+    const refreshToken =
+      typeof window !== 'undefined'
+        ? localStorage.getItem('refresh_token')
+        : null;
+
+    // 로그인 상태(refreshToken 보유)에서 401일 때만 갱신/리다이렉트를 시도한다.
+    // 비로그인 사용자가 홈·탐색에서 받는 401은 무시 → 강제 이동/루프 방지.
+    if (error.response?.status === 401 && originalRequest && refreshToken) {
       try {
-        const refreshToken = localStorage.getItem('refresh_token');
+        // 저장해둔 refreshToken으로 새 토큰 쌍 발급 (accessToken 1시간 만료)
         const { data } = await axios.post(
-          `${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/refresh`,
+          `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/auth/refresh`,
           { refreshToken },
+          { headers: { 'X-API-KEY': 'il-deung-haja' } },
         );
 
         localStorage.setItem('access_token', data.accessToken);
+        if (data.refreshToken) {
+          localStorage.setItem('refresh_token', data.refreshToken);
+        }
         originalRequest.headers.Authorization = `Bearer ${data.accessToken}`;
 
         return apiInstance(originalRequest);
       } catch {
         localStorage.removeItem('access_token');
         localStorage.removeItem('refresh_token');
-        // 로그인 페이지로 이동 (라우터 없이 window 사용)
-        window.location.href = '/login';
+        // 이미 홈이면 리다이렉트하지 않아 새로고침 루프를 막는다.
+        if (window.location.pathname !== '/') {
+          window.location.href = '/';
+        }
       }
     }
 
