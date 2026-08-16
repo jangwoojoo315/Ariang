@@ -5,7 +5,6 @@ export const apiInstance = axios.create({
   timeout: 10_000,
   headers: {
     'Content-Type': 'application/json',
-    'X-API-KEY': 'il-deung-haja',
   },
 });
 
@@ -40,7 +39,6 @@ apiInstance.interceptors.response.use(
         const { data } = await axios.post(
           `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/auth/refresh`,
           { refreshToken },
-          { headers: { 'X-API-KEY': 'il-deung-haja' } },
         );
 
         localStorage.setItem('access_token', data.accessToken);
