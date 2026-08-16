@@ -1,7 +1,7 @@
 'use client';
 import { useState } from 'react';
 import { PlaceholderImg, Modal, PrimaryBtn } from '@/shared/ui';
-import { IcoRoute, IcoCalendar, IcoArrowRight, IcoTrash, IcoSearch, IcoXClose, IcoPack, IcoCheck2, IcoChevronLeft, IcoChevronRight } from '@/shared/ui';
+import { IcoRoute, IcoCalendar, IcoArrowRight, IcoTrash, IcoSearch, IcoXClose, IcoPack, IcoCheck2, IcoChevronLeft } from '@/shared/ui';
 import { useWindowWidth } from '@/shared/lib';
 import type { Trip, SpotOrFestival } from '@/shared/types';
 
@@ -14,7 +14,6 @@ interface Props {
 }
 
 export function TripsScreen({ savedTrips, onUpdateChecklist, onDeleteTrip, onSelectItem, onUpdateDate }: Props) {
-  const [view, setView] = useState<'list'|'calendar'>('list');
   const [selectedTrip, setSelectedTrip] = useState<Trip|null>(null);
   const width = useWindowWidth();
   const isMobile = width < 768;
@@ -39,49 +38,34 @@ export function TripsScreen({ savedTrips, onUpdateChecklist, onDeleteTrip, onSel
 
   return (
     <div style={{ height:'100%', display:'flex', flexDirection:'column' }}>
-      <div style={{ background:'var(--surface)', padding:`20px ${px}px 0`, borderBottom:'1px solid var(--border)', flexShrink:0 }}>
-        <div style={{ fontWeight:800, fontSize:22, marginBottom:14 }}>내 여행</div>
-        <div style={{ display:'flex', gap:0 }}>
-          {[['list','목록'],['calendar','캘린더']].map(([key,label]) => (
-            <button key={key} onClick={() => setView(key as 'list'|'calendar')} style={{
-              flex:1, padding:'8px 0', fontWeight:700, fontSize:14,
-              borderBottom: view===key ? '2.5px solid var(--primary)' : '2.5px solid transparent',
-              color: view===key ? 'var(--primary)' : 'var(--text2)', transition:'all 0.15s',
-            }}>{label}</button>
-          ))}
-        </div>
+      <div style={{ background:'var(--surface)', padding:`20px ${px}px 16px`, borderBottom:'1px solid var(--border)', flexShrink:0 }}>
+        <div style={{ fontWeight:800, fontSize:22 }}>내 여행</div>
       </div>
 
-      {view === 'calendar' ? (
-        <div style={{ flex:1, overflow:'hidden', display:'flex', minHeight:0 }}>
-          <CalendarView trips={savedTrips} onSelect={setSelectedTrip} onDeleteTrip={onDeleteTrip} onSelectItem={onSelectItem} />
-        </div>
-      ) : (
-        <div style={{ flex:1, overflowY:'auto', padding:`16px ${px}px`, paddingBottom: isMobile ? 80 : 24 }} className="no-scroll">
-          {savedTrips.length === 0 ? (
-            <div style={{ display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', paddingTop:80, textAlign:'center' }}>
-              <div style={{ marginBottom:16 }}><IcoRoute size={56} color="var(--border)" /></div>
-              <div style={{ fontWeight:700, fontSize:18, marginBottom:8 }}>아직 저장된 여행이 없어요</div>
-              <div style={{ color:'var(--text2)', fontSize:14, lineHeight:1.65 }}>탐색 탭에서 마음에 드는 생태관광지나<br />축제를 저장해 보세요!</div>
-            </div>
-          ) : (
-            <div>
-              {Object.entries(grouped).sort().map(([month, trips]) => (
-                <div key={month} style={{ marginBottom:24 }}>
-                  <div style={{ fontSize:13, fontWeight:700, color:'var(--text2)', marginBottom:10 }}>
-                    {month === '날짜 미정' ? month : `${month.slice(0,4)}년 ${parseInt(month.slice(5))}월`}
-                  </div>
-                  <div style={{ display:'flex', flexDirection:'column', gap:10 }}>
-                    {[...trips].sort((a,b) => a.date > b.date ? 1 : -1).map(trip => (
-                      <TripCard key={trip.id} trip={trip} onSelect={() => setSelectedTrip(trip)} onDelete={() => onDeleteTrip(trip.id)} onSelectItem={onSelectItem} onUpdateDate={onUpdateDate} />
-                    ))}
-                  </div>
+      <div style={{ flex:1, overflowY:'auto', padding:`16px ${px}px`, paddingBottom: isMobile ? 80 : 24 }} className="no-scroll">
+        {savedTrips.length === 0 ? (
+          <div style={{ display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', paddingTop:80, textAlign:'center' }}>
+            <div style={{ marginBottom:16 }}><IcoRoute size={56} color="var(--border)" /></div>
+            <div style={{ fontWeight:700, fontSize:18, marginBottom:8 }}>아직 저장된 여행이 없어요</div>
+            <div style={{ color:'var(--text2)', fontSize:14, lineHeight:1.65 }}>탐색 탭에서 마음에 드는 생태관광지나<br />축제를 저장해 보세요!</div>
+          </div>
+        ) : (
+          <div>
+            {Object.entries(grouped).sort().map(([month, trips]) => (
+              <div key={month} style={{ marginBottom:24 }}>
+                <div style={{ fontSize:13, fontWeight:700, color:'var(--text2)', marginBottom:10 }}>
+                  {month === '날짜 미정' ? month : `${month.slice(0,4)}년 ${parseInt(month.slice(5))}월`}
                 </div>
-              ))}
-            </div>
-          )}
-        </div>
-      )}
+                <div style={{ display:'flex', flexDirection:'column', gap:10 }}>
+                  {[...trips].sort((a,b) => a.date > b.date ? 1 : -1).map(trip => (
+                    <TripCard key={trip.id} trip={trip} onSelect={() => setSelectedTrip(trip)} onDelete={() => onDeleteTrip(trip.id)} onSelectItem={onSelectItem} onUpdateDate={onUpdateDate} />
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 }
@@ -219,104 +203,6 @@ function DateEditModal({ trip, onClose, onSave }: { trip:Trip; onClose:()=>void;
         </PrimaryBtn>
       </div>
     </Modal>
-  );
-}
-
-function CalendarView({ trips, onSelect, onDeleteTrip, onSelectItem }: { trips:Trip[]; onSelect:(t:Trip)=>void; onDeleteTrip:(id:number)=>void; onSelectItem:(item:SpotOrFestival)=>void }) {
-  const [year, setYear] = useState(new Date().getFullYear());
-  const [month, setMonth] = useState(new Date().getMonth());
-  const [selectedDay, setSelectedDay] = useState<number|null>(null);
-  const [panelVisible, setPanelVisible] = useState(false);
-
-  const firstDay = new Date(year, month, 1).getDay();
-  const daysInMonth = new Date(year, month+1, 0).getDate();
-  const tripDates: Record<number, Trip[]> = {};
-  trips.forEach(t => {
-    if (t.date && t.date.startsWith(`${year}-${String(month+1).padStart(2,'0')}`)) {
-      const d = parseInt(t.date.slice(8));
-      if (!tripDates[d]) tripDates[d] = [];
-      tripDates[d].push(t);
-    }
-  });
-
-  const MONTHS = ['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월'];
-  const DAYS = ['일','월','화','수','목','금','토'];
-  const today = new Date();
-
-  const handleDayClick = (day: number, dayTrips: Trip[]) => {
-    if (!dayTrips.length) return;
-    if (selectedDay === day) { setPanelVisible(false); setTimeout(() => setSelectedDay(null), 280); }
-    else { setSelectedDay(day); setPanelVisible(true); }
-  };
-
-  const selectedTrips = selectedDay ? (tripDates[selectedDay] || []) : [];
-
-  return (
-    <div style={{ display:'flex', height:'100%', minHeight:0, width:'100%' }}>
-      <div style={{ flex: panelVisible ? '0 0 55%' : '0 0 100%', minWidth:0, padding:'16px 16px 80px', transition:'flex 0.28s cubic-bezier(0.32,0.72,0,1)', display:'flex', flexDirection:'column' }}>
-        <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:16, flexShrink:0 }}>
-          <button onClick={() => { setSelectedDay(null); setPanelVisible(false); if(month===0){setMonth(11);setYear(y=>y-1);}else setMonth(m=>m-1); }}
-            style={{ width:36, height:36, borderRadius:18, background:'var(--surface)', boxShadow:'0 1px 6px rgba(0,0,0,0.1)', display:'flex', alignItems:'center', justifyContent:'center', cursor:'pointer', border:'none' }}>
-            <IcoChevronLeft size={18} color="var(--text)" />
-          </button>
-          <div style={{ fontWeight:800, fontSize:18 }}>{year}년 {MONTHS[month]}</div>
-          <button onClick={() => { setSelectedDay(null); setPanelVisible(false); if(month===11){setMonth(0);setYear(y=>y+1);}else setMonth(m=>m+1); }}
-            style={{ width:36, height:36, borderRadius:18, background:'var(--surface)', boxShadow:'0 1px 6px rgba(0,0,0,0.1)', display:'flex', alignItems:'center', justifyContent:'center', cursor:'pointer', border:'none' }}>
-            <IcoChevronRight size={18} color="var(--text)" />
-          </button>
-        </div>
-        <div style={{ display:'grid', gridTemplateColumns:'repeat(7,1fr)', marginBottom:8, flexShrink:0 }}>
-          {DAYS.map((d,i) => (
-            <div key={d} style={{ textAlign:'center', fontSize:12, fontWeight:700, color: i===0 ? '#E57373' : i===6 ? '#5B8DB8' : 'var(--text2)', padding:'4px 0' }}>{d}</div>
-          ))}
-        </div>
-        <div style={{ display:'grid', gridTemplateColumns:'repeat(7,1fr)', gap:3, flex:1, alignContent:'stretch' }}>
-          {Array(firstDay).fill(null).map((_,i) => <div key={`e${i}`} />)}
-          {Array(daysInMonth).fill(null).map((_,i) => {
-            const day = i+1;
-            const isToday = today.getFullYear()===year && today.getMonth()===month && today.getDate()===day;
-            const dayTrips = tripDates[day] || [];
-            const isSelected = selectedDay===day;
-            const hasTrips = dayTrips.length > 0;
-            return (
-              <div key={day} onClick={() => handleDayClick(day, dayTrips)} style={{
-                borderRadius:10, cursor: hasTrips ? 'pointer' : 'default',
-                background: isSelected ? 'var(--primary)' : isToday ? 'transparent' : hasTrips ? 'var(--tag-bg)' : 'transparent',
-                border: isToday ? '2px solid var(--primary)' : hasTrips && !isSelected ? '1.5px solid var(--border)' : 'none',
-                transition:'all 0.15s', padding:'6px 2px 5px',
-                display:'flex', flexDirection:'column', alignItems:'center', gap:2,
-              }}>
-                <div style={{ fontSize:13, fontWeight: isToday||hasTrips ? 700 : 400, color: isSelected ? '#fff' : isToday ? 'var(--primary)' : hasTrips ? 'var(--primary)' : 'var(--text)' }}>{day}</div>
-                {hasTrips && (
-                  <div style={{ width:'100%', paddingInline:2, display:'flex', flexDirection:'column', gap:2 }}>
-                    {dayTrips.slice(0,2).map((t,ti) => (
-                      <div key={ti} style={{ fontSize:8, fontWeight:700, lineHeight:1.4, color: isSelected ? '#fff' : 'var(--primary)', background: isSelected ? 'rgba(255,255,255,0.2)' : 'var(--surface)', border:`1px solid ${isSelected ? 'rgba(255,255,255,0.35)' : 'var(--border)'}`, borderRadius:20, padding:'2px 4px', whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis', width:'100%', textAlign:'center', display:'block' }}>{t.item?.name}</div>
-                    ))}
-                    {dayTrips.length > 2 && <div style={{ fontSize:8, fontWeight:700, textAlign:'center', color: isSelected ? 'rgba(255,255,255,0.8)' : 'var(--text2)', background: isSelected ? 'rgba(255,255,255,0.15)' : '#F0F0F0', borderRadius:20, padding:'2px 4px', width:'100%' }}>+{dayTrips.length-2}</div>}
-                  </div>
-                )}
-              </div>
-            );
-          })}
-        </div>
-      </div>
-
-      <div style={{ flex: panelVisible ? '0 0 45%' : '0 0 0%', overflow:'hidden', transition:'flex 0.28s cubic-bezier(0.32,0.72,0,1)', flexShrink:0, borderLeft: panelVisible ? '1.5px solid var(--border)' : 'none', background:'var(--surface)', display:'flex', flexDirection:'column' }}>
-        <div style={{ width:'100%', padding:'16px 16px 0', display:'flex', flexDirection:'column', height:'100%' }}>
-          <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:12 }}>
-            <div style={{ fontWeight:700, fontSize:14 }}>{selectedDay && `${month+1}월 ${selectedDay}일`}</div>
-            <button onClick={() => { setPanelVisible(false); setTimeout(()=>setSelectedDay(null),280); }} style={{ width:28, height:28, borderRadius:14, background:'var(--bg)', border:'1px solid var(--border)', display:'flex', alignItems:'center', justifyContent:'center', cursor:'pointer' }}>
-              <IcoXClose size={14} color="var(--text2)" />
-            </button>
-          </div>
-          <div style={{ display:'flex', flexDirection:'column', gap:10, overflowY:'auto', flex:1, paddingBottom:80 }} className="no-scroll">
-            {selectedTrips.map(trip => (
-              <TripCard key={trip.id} trip={trip} onSelect={() => onSelect(trip)} onDelete={() => { onDeleteTrip(trip.id); if(selectedTrips.length<=1){setPanelVisible(false);setSelectedDay(null);} }} onSelectItem={onSelectItem} onUpdateDate={() => {}} />
-            ))}
-          </div>
-        </div>
-      </div>
-    </div>
   );
 }
 
