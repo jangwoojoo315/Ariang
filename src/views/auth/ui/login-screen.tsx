@@ -2,8 +2,6 @@
 
 // 로그인이 필요한 메뉴(내 여행·설정) 진입 시 노출되는 로그인 게이트 화면.
 export function LoginScreen() {
-  // 카카오 로그인 시작: 백엔드가 제공하는 OAuth URL로 전체 페이지 이동한다.
-  // (OAuth는 브라우저 리다이렉트가 필요하므로 fetch/axios가 아님)
   const handleKakaoLogin = () => {
     const authUrl = process.env.NEXT_PUBLIC_KAKAO_AUTH_URL;
     if (!authUrl) {
@@ -12,7 +10,12 @@ export function LoginScreen() {
       );
       return;
     }
-    window.location.href = authUrl;
+    const url = new URL(authUrl);
+    // 개발환경에선 ?dev=true 를 붙여 백엔드가 개발용으로 처리(예: localhost 콜백)하도록 한다.
+    if (process.env.NODE_ENV === "development") {
+      url.searchParams.set("dev", "true");
+    }
+    window.location.href = url.toString();
   };
 
   return (
