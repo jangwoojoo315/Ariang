@@ -8,8 +8,8 @@ import type { ChecklistItem } from './checklistItem';
 import type { TourSpot } from './tourSpot';
 
 export interface MyTour {
-  /** 내 여행 uuid */
-  id: string;
+  /** 내 여행 id */
+  id: number;
   /**
      * 방문 예정일 (미정 가능)
      * @nullable

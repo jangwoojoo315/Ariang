@@ -6,6 +6,6 @@
  */
 
 export interface DeleteMyTourResponse {
-  id: string;
+  id: number;
   success: boolean;
 }

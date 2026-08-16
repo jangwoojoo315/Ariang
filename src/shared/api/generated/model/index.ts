@@ -6,6 +6,7 @@
  */
 
 export * from './checklistItem';
+export * from './checklistItemInput';
 export * from './createMyTourRequest';
 export * from './createMyTourResponse';
 export * from './deleteMyTourResponse';

@@ -239,7 +239,7 @@ export function useCreateMyTour<TData = Awaited<ReturnType<typeof createMyTour>>
  * @summary 내 여행 삭제
  */
 export const deleteMyTour = (
-    id: string,
+    id: number,
  signal?: AbortSignal
 ) => {
 
@@ -253,14 +253,14 @@ export const deleteMyTour = (
 
 
 
-export const getDeleteMyTourQueryKey = (id: string,) => {
+export const getDeleteMyTourQueryKey = (id: number,) => {
     return [
     'DELETE', `/api/my-tour/${id}`
     ] as const;
     }
 
 
-export const getDeleteMyTourQueryOptions = <TData = Awaited<ReturnType<typeof deleteMyTour>>, TError = unknown>(id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof deleteMyTour>>, TError, TData>>, }
+export const getDeleteMyTourQueryOptions = <TData = Awaited<ReturnType<typeof deleteMyTour>>, TError = unknown>(id: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof deleteMyTour>>, TError, TData>>, }
 ) => {
 
 const {query: queryOptions} = options ?? {};
@@ -283,7 +283,7 @@ export type DeleteMyTourQueryError = unknown
 
 
 export function useDeleteMyTour<TData = Awaited<ReturnType<typeof deleteMyTour>>, TError = unknown>(
- id: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof deleteMyTour>>, TError, TData>> & Pick<
+ id: number, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof deleteMyTour>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof deleteMyTour>>,
           TError,
@@ -293,7 +293,7 @@ export function useDeleteMyTour<TData = Awaited<ReturnType<typeof deleteMyTour>>
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useDeleteMyTour<TData = Awaited<ReturnType<typeof deleteMyTour>>, TError = unknown>(
- id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof deleteMyTour>>, TError, TData>> & Pick<
+ id: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof deleteMyTour>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof deleteMyTour>>,
           TError,
@@ -303,7 +303,7 @@ export function useDeleteMyTour<TData = Awaited<ReturnType<typeof deleteMyTour>>
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useDeleteMyTour<TData = Awaited<ReturnType<typeof deleteMyTour>>, TError = unknown>(
- id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof deleteMyTour>>, TError, TData>>, }
+ id: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof deleteMyTour>>, TError, TData>>, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 /**
@@ -311,7 +311,7 @@ export function useDeleteMyTour<TData = Awaited<ReturnType<typeof deleteMyTour>>
  */
 
 export function useDeleteMyTour<TData = Awaited<ReturnType<typeof deleteMyTour>>, TError = unknown>(
- id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof deleteMyTour>>, TError, TData>>, }
+ id: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof deleteMyTour>>, TError, TData>>, }
  , queryClient?: QueryClient
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
@@ -331,7 +331,7 @@ export function useDeleteMyTour<TData = Awaited<ReturnType<typeof deleteMyTour>>
  * @summary 내 여행 방문일 수정
  */
 export const updateMyTourVisitDate = (
-    id: string,
+    id: number,
     updateVisitDateRequest: UpdateVisitDateRequest,
  signal?: AbortSignal
 ) => {
@@ -348,7 +348,7 @@ export const updateMyTourVisitDate = (
 
 
 
-export const getUpdateMyTourVisitDateQueryKey = (id: string,
+export const getUpdateMyTourVisitDateQueryKey = (id: number,
     updateVisitDateRequest?: UpdateVisitDateRequest,) => {
     return [
     'PATCH', `/api/my-tour/${id}/visit-date`, updateVisitDateRequest
@@ -356,7 +356,7 @@ export const getUpdateMyTourVisitDateQueryKey = (id: string,
     }
 
 
-export const getUpdateMyTourVisitDateQueryOptions = <TData = Awaited<ReturnType<typeof updateMyTourVisitDate>>, TError = unknown>(id: string,
+export const getUpdateMyTourVisitDateQueryOptions = <TData = Awaited<ReturnType<typeof updateMyTourVisitDate>>, TError = unknown>(id: number,
     updateVisitDateRequest: UpdateVisitDateRequest, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof updateMyTourVisitDate>>, TError, TData>>, }
 ) => {
 
@@ -380,7 +380,7 @@ export type UpdateMyTourVisitDateQueryError = unknown
 
 
 export function useUpdateMyTourVisitDate<TData = Awaited<ReturnType<typeof updateMyTourVisitDate>>, TError = unknown>(
- id: string,
+ id: number,
     updateVisitDateRequest: UpdateVisitDateRequest, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof updateMyTourVisitDate>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof updateMyTourVisitDate>>,
@@ -391,7 +391,7 @@ export function useUpdateMyTourVisitDate<TData = Awaited<ReturnType<typeof updat
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useUpdateMyTourVisitDate<TData = Awaited<ReturnType<typeof updateMyTourVisitDate>>, TError = unknown>(
- id: string,
+ id: number,
     updateVisitDateRequest: UpdateVisitDateRequest, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof updateMyTourVisitDate>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof updateMyTourVisitDate>>,
@@ -402,7 +402,7 @@ export function useUpdateMyTourVisitDate<TData = Awaited<ReturnType<typeof updat
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useUpdateMyTourVisitDate<TData = Awaited<ReturnType<typeof updateMyTourVisitDate>>, TError = unknown>(
- id: string,
+ id: number,
     updateVisitDateRequest: UpdateVisitDateRequest, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof updateMyTourVisitDate>>, TError, TData>>, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
@@ -411,7 +411,7 @@ export function useUpdateMyTourVisitDate<TData = Awaited<ReturnType<typeof updat
  */
 
 export function useUpdateMyTourVisitDate<TData = Awaited<ReturnType<typeof updateMyTourVisitDate>>, TError = unknown>(
- id: string,
+ id: number,
     updateVisitDateRequest: UpdateVisitDateRequest, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof updateMyTourVisitDate>>, TError, TData>>, }
  , queryClient?: QueryClient
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
@@ -429,17 +429,17 @@ export function useUpdateMyTourVisitDate<TData = Awaited<ReturnType<typeof updat
 
 
 /**
- * @summary 준비물 체크리스트 수정
+ * @summary 준비물 체크리스트 수정 (전체 교체)
  */
 export const updateChecklist = (
-    id: string,
+    id: number,
     updateChecklistRequest: UpdateChecklistRequest,
  signal?: AbortSignal
 ) => {
 
 
       return customInstance<SuccessResponse>(
-      {url: `/api/my-tour/${id}/checklist`, method: 'PUT',
+      {url: `/api/my-tour/${id}/checklist`, method: 'PATCH',
       headers: {'Content-Type': 'application/json', },
       data: updateChecklistRequest, signal
     },
@@ -449,15 +449,15 @@ export const updateChecklist = (
 
 
 
-export const getUpdateChecklistQueryKey = (id: string,
+export const getUpdateChecklistQueryKey = (id: number,
     updateChecklistRequest?: UpdateChecklistRequest,) => {
     return [
-    'PUT', `/api/my-tour/${id}/checklist`, updateChecklistRequest
+    'PATCH', `/api/my-tour/${id}/checklist`, updateChecklistRequest
     ] as const;
     }
 
 
-export const getUpdateChecklistQueryOptions = <TData = Awaited<ReturnType<typeof updateChecklist>>, TError = unknown>(id: string,
+export const getUpdateChecklistQueryOptions = <TData = Awaited<ReturnType<typeof updateChecklist>>, TError = unknown>(id: number,
     updateChecklistRequest: UpdateChecklistRequest, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof updateChecklist>>, TError, TData>>, }
 ) => {
 
@@ -481,7 +481,7 @@ export type UpdateChecklistQueryError = unknown
 
 
 export function useUpdateChecklist<TData = Awaited<ReturnType<typeof updateChecklist>>, TError = unknown>(
- id: string,
+ id: number,
     updateChecklistRequest: UpdateChecklistRequest, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof updateChecklist>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof updateChecklist>>,
@@ -492,7 +492,7 @@ export function useUpdateChecklist<TData = Awaited<ReturnType<typeof updateCheck
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useUpdateChecklist<TData = Awaited<ReturnType<typeof updateChecklist>>, TError = unknown>(
- id: string,
+ id: number,
     updateChecklistRequest: UpdateChecklistRequest, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof updateChecklist>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof updateChecklist>>,
@@ -503,16 +503,16 @@ export function useUpdateChecklist<TData = Awaited<ReturnType<typeof updateCheck
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useUpdateChecklist<TData = Awaited<ReturnType<typeof updateChecklist>>, TError = unknown>(
- id: string,
+ id: number,
     updateChecklistRequest: UpdateChecklistRequest, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof updateChecklist>>, TError, TData>>, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 /**
- * @summary 준비물 체크리스트 수정
+ * @summary 준비물 체크리스트 수정 (전체 교체)
  */
 
 export function useUpdateChecklist<TData = Awaited<ReturnType<typeof updateChecklist>>, TError = unknown>(
- id: string,
+ id: number,
     updateChecklistRequest: UpdateChecklistRequest, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof updateChecklist>>, TError, TData>>, }
  , queryClient?: QueryClient
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {

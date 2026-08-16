@@ -5,8 +5,11 @@
  * OpenAPI spec version: 0.0.1
  */
 
+/**
+ * 체크리스트 응답 항목 (id는 서버가 매 요청마다 새로 발급)
+ */
 export interface ChecklistItem {
-  id: string;
+  id: number;
   checked: boolean;
   text: string;
 }

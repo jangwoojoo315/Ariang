@@ -176,9 +176,10 @@ paths:
         - name: id
           in: path
           required: true
-          description: 내 여행 uuid
+          description: 내 여행 id
           schema:
-            type: string
+            type: integer
+            format: int64
       responses:
         '200':
           description: 성공
@@ -197,9 +198,10 @@ paths:
         - name: id
           in: path
           required: true
-          description: 내 여행 uuid
+          description: 내 여행 id
           schema:
-            type: string
+            type: integer
+            format: int64
       requestBody:
         required: true
         content:
@@ -215,8 +217,8 @@ paths:
                 $ref: '#/components/schemas/SuccessResponse'
 
   /api/my-tour/{id}/checklist:
-    put:
-      summary: 준비물 체크리스트 수정
+    patch:
+      summary: 준비물 체크리스트 수정 (전체 교체)
       operationId: updateChecklist
       tags:
         - MyTour
@@ -224,9 +226,10 @@ paths:
         - name: id
           in: path
           required: true
-          description: 내 여행 uuid
+          description: 내 여행 id
           schema:
-            type: string
+            type: integer
+            format: int64
       requestBody:
         required: true
         content:
@@ -416,20 +419,36 @@ components:
 
     ChecklistItem:
       type: object
+      description: "체크리스트 응답 항목 (id는 서버가 매 요청마다 새로 발급)"
       required:
         - id
         - checked
         - text
       properties:
         id:
-          type: string
-          example: "chk-1"
+          type: integer
+          format: int64
+          example: 1
         checked:
           type: boolean
           example: false
         text:
           type: string
           example: "여벌 옷"
+
+    ChecklistItemInput:
+      type: object
+      description: "체크리스트 수정 요청 항목 (id 없이 text·checked만 전송, 전체 교체)"
+      required:
+        - text
+        - checked
+      properties:
+        text:
+          type: string
+          example: "여벌 옷"
+        checked:
+          type: boolean
+          example: false
 
     MyTour:
       type: object
@@ -439,9 +458,10 @@ components:
         - checklist
       properties:
         id:
-          type: string
-          description: "내 여행 uuid"
-          example: "mt-1001"
+          type: integer
+          format: int64
+          description: "내 여행 id"
+          example: 1001
         visitDate:
           type: string
           format: date
@@ -477,9 +497,10 @@ components:
         - success
       properties:
         id:
-          type: string
-          description: "내 여행 uuid"
-          example: "mt-1001"
+          type: integer
+          format: int64
+          description: "내 여행 id"
+          example: 1001
         success:
           type: boolean
           example: true
@@ -491,8 +512,9 @@ components:
         - success
       properties:
         id:
-          type: string
-          example: "mt-1001"
+          type: integer
+          format: int64
+          example: 1001
         success:
           type: boolean
           example: true
@@ -514,7 +536,7 @@ components:
         checklist:
           type: array
           items:
-            $ref: '#/components/schemas/ChecklistItem'
+            $ref: '#/components/schemas/ChecklistItemInput'
 
     SuccessResponse:
       type: object

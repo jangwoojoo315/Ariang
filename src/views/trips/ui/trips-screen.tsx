@@ -12,7 +12,7 @@ import {
   updateChecklist,
   getGetMyTourListQueryKey,
 } from '@/shared/api/generated/my-tour/my-tour';
-import type { MyTour, ChecklistItem } from '@/shared/api/generated/model';
+import type { MyTour, ChecklistItemInput } from '@/shared/api/generated/model';
 import type { SpotOrFestival } from '@/shared/types';
 
 interface Props {
@@ -22,7 +22,7 @@ interface Props {
 export function TripsScreen({ onSelectItem }: Props) {
   const qc = useQueryClient();
   const { data, isLoading, isError } = useGetMyTourList();
-  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [selectedId, setSelectedId] = useState<number | null>(null);
   const width = useWindowWidth();
   const isMobile = width < 768;
   const px = isMobile ? 16 : 28;
@@ -31,15 +31,15 @@ export function TripsScreen({ onSelectItem }: Props) {
   const invalidate = () =>
     qc.invalidateQueries({ queryKey: getGetMyTourListQueryKey() });
 
-  const handleDelete = async (id: string) => {
+  const handleDelete = async (id: number) => {
     await deleteMyTour(id);
     invalidate();
   };
-  const handleUpdateDate = async (id: string, date: string) => {
+  const handleUpdateDate = async (id: number, date: string) => {
     await updateMyTourVisitDate(id, { visitDate: date || null });
     invalidate();
   };
-  const handleUpdateChecklist = async (id: string, checklist: ChecklistItem[]) => {
+  const handleUpdateChecklist = async (id: number, checklist: ChecklistItemInput[]) => {
     await updateChecklist(id, { checklist });
     invalidate();
   };
@@ -50,7 +50,7 @@ export function TripsScreen({ onSelectItem }: Props) {
     return acc;
   }, {});
 
-  const selectedTrip = selectedId ? trips.find(t => t.id === selectedId) : null;
+  const selectedTrip = selectedId !== null ? trips.find(t => t.id === selectedId) : null;
   if (selectedTrip) {
     return (
       <ChecklistScreen
@@ -106,7 +106,7 @@ export function TripsScreen({ onSelectItem }: Props) {
 function TripCard({ trip, onSelect, onDelete, onSelectItem, onUpdateDate }: {
   trip: MyTour; onSelect:()=>void; onDelete:()=>void;
   onSelectItem:(item:SpotOrFestival)=>void;
-  onUpdateDate:(id:string,date:string)=>void;
+  onUpdateDate:(id:number,date:string)=>void;
 }) {
   const spot = mapTourSpotToSpot(trip.tourInfo, 'forest');
   const date = trip.visitDate;
@@ -240,8 +240,11 @@ function DateEditModal({ trip, onClose, onSave }: { trip:MyTour; onClose:()=>voi
   );
 }
 
-function ChecklistScreen({ trip, onBack, onUpdate }: { trip:MyTour; onBack:()=>void; onUpdate:(items:ChecklistItem[])=>void }) {
-  const [items, setItems] = useState<ChecklistItem[]>(trip.checklist ?? []);
+function ChecklistScreen({ trip, onBack, onUpdate }: { trip:MyTour; onBack:()=>void; onUpdate:(items:ChecklistItemInput[])=>void }) {
+  // 요청은 {text, checked}만 보내는 전체 교체 방식이라 id 없이 관리한다.
+  const [items, setItems] = useState<ChecklistItemInput[]>(
+    (trip.checklist ?? []).map(c => ({ text: c.text, checked: c.checked })),
+  );
   const [newItem, setNewItem] = useState('');
   const done = items.filter(i => i.checked).length;
 
@@ -251,7 +254,7 @@ function ChecklistScreen({ trip, onBack, onUpdate }: { trip:MyTour; onBack:()=>v
   };
   const addItem = () => {
     if (!newItem.trim()) return;
-    const next = [...items, { id:`chk-${Date.now()}`, checked:false, text:newItem.trim() }];
+    const next = [...items, { checked:false, text:newItem.trim() }];
     setItems(next); onUpdate(next); setNewItem('');
   };
   const removeItem = (idx: number) => {
@@ -279,7 +282,7 @@ function ChecklistScreen({ trip, onBack, onUpdate }: { trip:MyTour; onBack:()=>v
       </div>
       <div style={{ flex:1, overflowY:'auto', padding:'16px 20px' }} className="no-scroll">
         {items.map((item, idx) => (
-          <div key={item.id} style={{ display:'flex', alignItems:'center', gap:12, padding:'12px 14px', background:'var(--surface)', borderRadius:12, marginBottom:8, border:'1px solid var(--border)', opacity: item.checked ? 0.65 : 1, transition:'opacity 0.2s' }}>
+          <div key={idx} style={{ display:'flex', alignItems:'center', gap:12, padding:'12px 14px', background:'var(--surface)', borderRadius:12, marginBottom:8, border:'1px solid var(--border)', opacity: item.checked ? 0.65 : 1, transition:'opacity 0.2s' }}>
             <button onClick={() => toggle(idx)} style={{ width:24, height:24, borderRadius:12, border:`2px solid ${item.checked ? 'var(--primary)' : '#CCC'}`, background: item.checked ? 'var(--primary)' : 'transparent', flexShrink:0, display:'flex', alignItems:'center', justifyContent:'center', color:'#fff', fontSize:13, transition:'all 0.15s', cursor:'pointer' }}>
               {item.checked && <IcoCheck2 size={11} color="#fff" />}
             </button>

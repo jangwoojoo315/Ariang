@@ -4,8 +4,8 @@
  * 아이랑 - 홈 화면 API
  * OpenAPI spec version: 0.0.1
  */
-import type { ChecklistItem } from './checklistItem';
+import type { ChecklistItemInput } from './checklistItemInput';
 
 export interface UpdateChecklistRequest {
-  checklist: ChecklistItem[];
+  checklist: ChecklistItemInput[];
 }

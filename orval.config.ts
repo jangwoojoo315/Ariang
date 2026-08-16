@@ -9,7 +9,6 @@ export default defineConfig({
       schemas: './src/shared/api/generated/model',
       client: 'react-query',
       httpClient: 'axios',
-      mock: true, // MSW 핸들러 + faker 목데이터 생성
       clean: true,
       override: {
         mutator: {

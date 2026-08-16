@@ -6,7 +6,7 @@
  */
 
 export interface CreateMyTourResponse {
-  /** 내 여행 uuid */
-  id: string;
+  /** 내 여행 id */
+  id: number;
   success: boolean;
 }
