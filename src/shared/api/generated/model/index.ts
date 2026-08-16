@@ -5,9 +5,17 @@
  * OpenAPI spec version: 0.0.1
  */
 
+export * from './checklistItem';
+export * from './createMyTourRequest';
+export * from './createMyTourResponse';
+export * from './deleteMyTourResponse';
 export * from './depth1';
 export * from './depth2';
+export * from './myTour';
 export * from './recentPlace';
 export * from './region';
 export * from './searchHistoryTourParams';
+export * from './successResponse';
 export * from './tourSpot';
+export * from './updateChecklistRequest';
+export * from './updateVisitDateRequest';

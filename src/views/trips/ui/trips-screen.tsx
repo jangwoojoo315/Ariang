@@ -1,37 +1,62 @@
 'use client';
 import { useState } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import { PlaceholderImg, Modal, PrimaryBtn } from '@/shared/ui';
 import { IcoRoute, IcoCalendar, IcoArrowRight, IcoTrash, IcoSearch, IcoXClose, IcoPack, IcoCheck2, IcoChevronLeft } from '@/shared/ui';
 import { useWindowWidth } from '@/shared/lib';
-import type { Trip, SpotOrFestival } from '@/shared/types';
+import { mapTourSpotToSpot } from '@/entities/spot';
+import {
+  useGetMyTourList,
+  deleteMyTour,
+  updateMyTourVisitDate,
+  updateChecklist,
+  getGetMyTourListQueryKey,
+} from '@/shared/api/generated/my-tour/my-tour';
+import type { MyTour, ChecklistItem } from '@/shared/api/generated/model';
+import type { SpotOrFestival } from '@/shared/types';
 
 interface Props {
-  savedTrips: Trip[];
-  onUpdateChecklist: (tripId: number, items: Trip['checklist']) => void;
-  onDeleteTrip: (tripId: number) => void;
   onSelectItem: (item: SpotOrFestival) => void;
-  onUpdateDate: (tripId: number, newDate: string) => void;
 }
 
-export function TripsScreen({ savedTrips, onUpdateChecklist, onDeleteTrip, onSelectItem, onUpdateDate }: Props) {
-  const [selectedTrip, setSelectedTrip] = useState<Trip|null>(null);
+export function TripsScreen({ onSelectItem }: Props) {
+  const qc = useQueryClient();
+  const { data, isLoading, isError } = useGetMyTourList();
+  const [selectedId, setSelectedId] = useState<string | null>(null);
   const width = useWindowWidth();
   const isMobile = width < 768;
   const px = isMobile ? 16 : 28;
 
-  const grouped = savedTrips.reduce<Record<string, Trip[]>>((acc, trip) => {
-    const key = trip.date ? trip.date.slice(0,7) : '날짜 미정';
-    if (!acc[key]) acc[key] = [];
-    acc[key].push(trip);
+  const trips = data ?? [];
+  const invalidate = () =>
+    qc.invalidateQueries({ queryKey: getGetMyTourListQueryKey() });
+
+  const handleDelete = async (id: string) => {
+    await deleteMyTour(id);
+    invalidate();
+  };
+  const handleUpdateDate = async (id: string, date: string) => {
+    await updateMyTourVisitDate(id, { visitDate: date || null });
+    invalidate();
+  };
+  const handleUpdateChecklist = async (id: string, checklist: ChecklistItem[]) => {
+    await updateChecklist(id, { checklist });
+    invalidate();
+  };
+
+  const grouped = trips.reduce<Record<string, MyTour[]>>((acc, trip) => {
+    const key = trip.visitDate ? trip.visitDate.slice(0, 7) : '날짜 미정';
+    (acc[key] ??= []).push(trip);
     return acc;
   }, {});
 
+  const selectedTrip = selectedId ? trips.find(t => t.id === selectedId) : null;
   if (selectedTrip) {
     return (
       <ChecklistScreen
         trip={selectedTrip}
-        onBack={() => setSelectedTrip(null)}
-        onUpdate={items => { onUpdateChecklist(selectedTrip.id, items); setSelectedTrip(t => t ? {...t, checklist:items} : null); }}
+        onBack={() => setSelectedId(null)}
+        onUpdate={items => handleUpdateChecklist(selectedTrip.id, items)}
       />
     );
   }
@@ -43,7 +68,15 @@ export function TripsScreen({ savedTrips, onUpdateChecklist, onDeleteTrip, onSel
       </div>
 
       <div style={{ flex:1, overflowY:'auto', padding:`16px ${px}px`, paddingBottom: isMobile ? 80 : 24 }} className="no-scroll">
-        {savedTrips.length === 0 ? (
+        {isLoading ? (
+          <div style={{ textAlign:'center', paddingTop:80, color:'var(--text2)', fontSize:14 }}>불러오는 중…</div>
+        ) : isError ? (
+          <div style={{ display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', paddingTop:80, textAlign:'center' }}>
+            <div style={{ fontSize:48, marginBottom:12 }}>⚠️</div>
+            <div style={{ fontWeight:700, fontSize:18, marginBottom:8 }}>여행 정보를 불러오지 못했어요</div>
+            <div style={{ color:'var(--text2)', fontSize:14 }}>잠시 후 다시 시도해 주세요</div>
+          </div>
+        ) : trips.length === 0 ? (
           <div style={{ display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', paddingTop:80, textAlign:'center' }}>
             <div style={{ marginBottom:16 }}><IcoRoute size={56} color="var(--border)" /></div>
             <div style={{ fontWeight:700, fontSize:18, marginBottom:8 }}>아직 저장된 여행이 없어요</div>
@@ -51,14 +84,14 @@ export function TripsScreen({ savedTrips, onUpdateChecklist, onDeleteTrip, onSel
           </div>
         ) : (
           <div>
-            {Object.entries(grouped).sort().map(([month, trips]) => (
+            {Object.entries(grouped).sort().map(([month, monthTrips]) => (
               <div key={month} style={{ marginBottom:24 }}>
                 <div style={{ fontSize:13, fontWeight:700, color:'var(--text2)', marginBottom:10 }}>
                   {month === '날짜 미정' ? month : `${month.slice(0,4)}년 ${parseInt(month.slice(5))}월`}
                 </div>
                 <div style={{ display:'flex', flexDirection:'column', gap:10 }}>
-                  {[...trips].sort((a,b) => a.date > b.date ? 1 : -1).map(trip => (
-                    <TripCard key={trip.id} trip={trip} onSelect={() => setSelectedTrip(trip)} onDelete={() => onDeleteTrip(trip.id)} onSelectItem={onSelectItem} onUpdateDate={onUpdateDate} />
+                  {[...monthTrips].sort((a,b) => (a.visitDate ?? '') > (b.visitDate ?? '') ? 1 : -1).map(trip => (
+                    <TripCard key={trip.id} trip={trip} onSelect={() => setSelectedId(trip.id)} onDelete={() => handleDelete(trip.id)} onSelectItem={onSelectItem} onUpdateDate={handleUpdateDate} />
                   ))}
                 </div>
               </div>
@@ -71,14 +104,17 @@ export function TripsScreen({ savedTrips, onUpdateChecklist, onDeleteTrip, onSel
 }
 
 function TripCard({ trip, onSelect, onDelete, onSelectItem, onUpdateDate }: {
-  trip: Trip; onSelect:()=>void; onDelete:()=>void;
+  trip: MyTour; onSelect:()=>void; onDelete:()=>void;
   onSelectItem:(item:SpotOrFestival)=>void;
-  onUpdateDate:(id:number,date:string)=>void;
+  onUpdateDate:(id:string,date:string)=>void;
 }) {
-  const done = trip.checklist ? trip.checklist.filter(i => i.checked).length : 0;
-  const total = trip.checklist ? trip.checklist.length : 0;
+  const spot = mapTourSpotToSpot(trip.tourInfo, 'forest');
+  const date = trip.visitDate;
+  const checklist = trip.checklist ?? [];
+  const done = checklist.filter(i => i.checked).length;
+  const total = checklist.length;
   const pct = total > 0 ? Math.round(done/total*100) : 0;
-  const daysUntil = trip.date ? Math.ceil((new Date(trip.date).getTime() - new Date().getTime()) / 86400000) : null;
+  const daysUntil = date ? Math.ceil((new Date(date).getTime() - new Date().getTime()) / 86400000) : null;
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [showDateEdit, setShowDateEdit] = useState(false);
 
@@ -89,13 +125,13 @@ function TripCard({ trip, onSelect, onDelete, onSelectItem, onUpdateDate }: {
       onMouseLeave={e => e.currentTarget.style.transform=''}
     >
       <div onClick={onSelect} style={{ width:54, height:54, borderRadius:14, overflow:'hidden', flexShrink:0, cursor:'pointer' }}>
-        <PlaceholderImg theme={trip.item?.theme || 'forest'} img={trip.item?.img} height={54} />
+        <PlaceholderImg theme={spot.theme} img={spot.img} height={54} />
       </div>
       <div onClick={onSelect} style={{ flex:1, minWidth:0, cursor:'pointer' }}>
-        <div style={{ fontWeight:700, fontSize:15, marginBottom:2, whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis' }}>{trip.item?.name}</div>
+        <div style={{ fontWeight:700, fontSize:15, marginBottom:2, whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis' }}>{spot.name}</div>
         <div style={{ fontSize:12, color:'var(--text2)', marginBottom:6, display:'flex', alignItems:'center', gap:5 }}>
           <IcoCalendar size={12} color="var(--text3)" />
-          {trip.date ? trip.date.replace(/-/g,'.') : '날짜 미정'}
+          {date ? date.replace(/-/g,'.') : '날짜 미정'}
           {daysUntil !== null && daysUntil >= 0 && daysUntil <= 30 && (
             <span style={{ color: daysUntil<=1 ? '#E57373' : 'var(--accent)', fontWeight:700 }}>
               {daysUntil===0 ? '오늘!' : daysUntil===1 ? 'D-1' : `D-${daysUntil}`}
@@ -113,24 +149,22 @@ function TripCard({ trip, onSelect, onDelete, onSelectItem, onUpdateDate }: {
             </div>
           </div>
         )}
-        {trip.item && (
-          <div style={{ marginTop:8, display:'flex', gap:6, flexWrap:'wrap' }}>
-            <button onClick={e => { e.stopPropagation(); onSelectItem(trip.item); }} style={{
-              display:'inline-flex', alignItems:'center', gap:5, background:'var(--bg)', border:'1.5px solid var(--border)',
-              borderRadius:20, padding:'5px 12px', fontSize:11, fontWeight:600, color:'var(--primary)', cursor:'pointer',
-            }}
-            onMouseEnter={e => e.currentTarget.style.background='var(--tag-bg)'}
-            onMouseLeave={e => e.currentTarget.style.background='var(--bg)'}
-            ><IcoSearch size={11} color="var(--primary)" />여행지 정보보기</button>
-            <button onClick={e => { e.stopPropagation(); setShowDateEdit(true); }} style={{
-              display:'inline-flex', alignItems:'center', gap:5, background:'var(--bg)', border:'1.5px solid var(--border)',
-              borderRadius:20, padding:'5px 12px', fontSize:11, fontWeight:600, color:'var(--text2)', cursor:'pointer',
-            }}
-            onMouseEnter={e => e.currentTarget.style.background='#F5F5F5'}
-            onMouseLeave={e => e.currentTarget.style.background='var(--bg)'}
-            ><IcoCalendar size={11} color="var(--text2)" />날짜 수정</button>
-          </div>
-        )}
+        <div style={{ marginTop:8, display:'flex', gap:6, flexWrap:'wrap' }}>
+          <button onClick={e => { e.stopPropagation(); onSelectItem(spot); }} style={{
+            display:'inline-flex', alignItems:'center', gap:5, background:'var(--bg)', border:'1.5px solid var(--border)',
+            borderRadius:20, padding:'5px 12px', fontSize:11, fontWeight:600, color:'var(--primary)', cursor:'pointer',
+          }}
+          onMouseEnter={e => e.currentTarget.style.background='var(--tag-bg)'}
+          onMouseLeave={e => e.currentTarget.style.background='var(--bg)'}
+          ><IcoSearch size={11} color="var(--primary)" />여행지 정보보기</button>
+          <button onClick={e => { e.stopPropagation(); setShowDateEdit(true); }} style={{
+            display:'inline-flex', alignItems:'center', gap:5, background:'var(--bg)', border:'1.5px solid var(--border)',
+            borderRadius:20, padding:'5px 12px', fontSize:11, fontWeight:600, color:'var(--text2)', cursor:'pointer',
+          }}
+          onMouseEnter={e => e.currentTarget.style.background='#F5F5F5'}
+          onMouseLeave={e => e.currentTarget.style.background='var(--bg)'}
+          ><IcoCalendar size={11} color="var(--text2)" />날짜 수정</button>
+        </div>
       </div>
       <div style={{ display:'flex', flexDirection:'column', alignItems:'center', gap:6, flexShrink:0 }}>
         <div onClick={onSelect} style={{ color:'var(--text3)', cursor:'pointer', padding:'4px' }}>
@@ -155,9 +189,9 @@ function TripCard({ trip, onSelect, onDelete, onSelectItem, onUpdateDate }: {
   );
 }
 
-function DateEditModal({ trip, onClose, onSave }: { trip:Trip; onClose:()=>void; onSave:(date:string)=>void }) {
-  const [undecided, setUndecided] = useState(!trip.date);
-  const [date, setDate] = useState(trip.date || '');
+function DateEditModal({ trip, onClose, onSave }: { trip:MyTour; onClose:()=>void; onSave:(date:string)=>void }) {
+  const [undecided, setUndecided] = useState(!trip.visitDate);
+  const [date, setDate] = useState(trip.visitDate || '');
   const today = new Date().toISOString().slice(0,10);
   return (
     <Modal onClose={onClose}>
@@ -167,7 +201,7 @@ function DateEditModal({ trip, onClose, onSave }: { trip:Trip; onClose:()=>void;
         </div>
         <div style={{ fontWeight:800, fontSize:18 }}>날짜 수정</div>
       </div>
-      <div style={{ color:'var(--text2)', fontSize:13, marginBottom:18, paddingLeft:46 }}>{trip.item?.name}</div>
+      <div style={{ color:'var(--text2)', fontSize:13, marginBottom:18, paddingLeft:46 }}>{trip.tourInfo.name}</div>
       <div style={{ marginBottom:20 }}>
         <div style={{ fontSize:12, color:'var(--text2)', fontWeight:600, marginBottom:8 }}>방문 예정일</div>
         <div style={{ display:'flex', gap:8, marginBottom:10 }}>
@@ -206,8 +240,8 @@ function DateEditModal({ trip, onClose, onSave }: { trip:Trip; onClose:()=>void;
   );
 }
 
-function ChecklistScreen({ trip, onBack, onUpdate }: { trip:Trip; onBack:()=>void; onUpdate:(items:Trip['checklist'])=>void }) {
-  const [items, setItems] = useState(trip.checklist || []);
+function ChecklistScreen({ trip, onBack, onUpdate }: { trip:MyTour; onBack:()=>void; onUpdate:(items:ChecklistItem[])=>void }) {
+  const [items, setItems] = useState<ChecklistItem[]>(trip.checklist ?? []);
   const [newItem, setNewItem] = useState('');
   const done = items.filter(i => i.checked).length;
 
@@ -217,7 +251,7 @@ function ChecklistScreen({ trip, onBack, onUpdate }: { trip:Trip; onBack:()=>voi
   };
   const addItem = () => {
     if (!newItem.trim()) return;
-    const next = [...items, {label:newItem.trim(),checked:false}];
+    const next = [...items, { id:`chk-${Date.now()}`, checked:false, text:newItem.trim() }];
     setItems(next); onUpdate(next); setNewItem('');
   };
   const removeItem = (idx: number) => {
@@ -235,7 +269,7 @@ function ChecklistScreen({ trip, onBack, onUpdate }: { trip:Trip; onBack:()=>voi
           <div style={{ fontWeight:800, fontSize:16, display:'flex', alignItems:'center', gap:6 }}>
             <IcoPack size={16} color="var(--primary)" /> 준비물 체크리스트
           </div>
-          <div style={{ fontSize:12, color:'var(--text2)' }}>{trip.item?.name} · {done}/{items.length}개 완료</div>
+          <div style={{ fontSize:12, color:'var(--text2)' }}>{trip.tourInfo.name} · {done}/{items.length}개 완료</div>
         </div>
       </div>
       <div style={{ padding:'12px 20px', background:'var(--surface)', borderBottom:'1px solid var(--border)' }}>
@@ -245,11 +279,11 @@ function ChecklistScreen({ trip, onBack, onUpdate }: { trip:Trip; onBack:()=>voi
       </div>
       <div style={{ flex:1, overflowY:'auto', padding:'16px 20px' }} className="no-scroll">
         {items.map((item, idx) => (
-          <div key={idx} style={{ display:'flex', alignItems:'center', gap:12, padding:'12px 14px', background:'var(--surface)', borderRadius:12, marginBottom:8, border:'1px solid var(--border)', opacity: item.checked ? 0.65 : 1, transition:'opacity 0.2s' }}>
+          <div key={item.id} style={{ display:'flex', alignItems:'center', gap:12, padding:'12px 14px', background:'var(--surface)', borderRadius:12, marginBottom:8, border:'1px solid var(--border)', opacity: item.checked ? 0.65 : 1, transition:'opacity 0.2s' }}>
             <button onClick={() => toggle(idx)} style={{ width:24, height:24, borderRadius:12, border:`2px solid ${item.checked ? 'var(--primary)' : '#CCC'}`, background: item.checked ? 'var(--primary)' : 'transparent', flexShrink:0, display:'flex', alignItems:'center', justifyContent:'center', color:'#fff', fontSize:13, transition:'all 0.15s', cursor:'pointer' }}>
               {item.checked && <IcoCheck2 size={11} color="#fff" />}
             </button>
-            <span style={{ flex:1, fontSize:15, textDecoration: item.checked ? 'line-through' : 'none' }}>{item.label}</span>
+            <span style={{ flex:1, fontSize:15, textDecoration: item.checked ? 'line-through' : 'none' }}>{item.text}</span>
             <button onClick={() => removeItem(idx)} style={{ color:'#CCC', padding:'0 4px', background:'none', border:'none', cursor:'pointer', display:'flex', alignItems:'center' }}>
               <IcoXClose size={16} color="#CCC" />
             </button>

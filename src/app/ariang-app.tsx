@@ -237,25 +237,7 @@ export function AriangApp() {
             }}
           >
             {isLoggedIn ? (
-              <TripsScreen
-                savedTrips={savedTrips}
-                onUpdateChecklist={(id, items) =>
-                  setSavedTrips((ts) =>
-                    ts.map((t) =>
-                      t.id === id ? { ...t, checklist: items } : t,
-                    ),
-                  )
-                }
-                onDeleteTrip={(id) =>
-                  setSavedTrips((ts) => ts.filter((t) => t.id !== id))
-                }
-                onSelectItem={setSelectedItem}
-                onUpdateDate={(id, date) =>
-                  setSavedTrips((ts) =>
-                    ts.map((t) => (t.id === id ? { ...t, date } : t)),
-                  )
-                }
-              />
+              <TripsScreen onSelectItem={setSelectedItem} />
             ) : (
               <LoginScreen />
             )}
