@@ -14,7 +14,8 @@ import {
   createMyTour,
   getGetMyTourListQueryKey,
 } from "@/shared/api/generated/my-tour/my-tour";
-import type { SpotOrFestival, Bundle, UserProfile } from "@/shared/types";
+import { useGetUserInfo } from "@/shared/api/generated/user/user";
+import type { SpotOrFestival, Bundle } from "@/shared/types";
 
 type Screen = "home" | "search" | "bundle" | "trips" | "settings";
 
@@ -28,7 +29,6 @@ const NAV = [
 
 export function AriangApp() {
   const [screen, setScreen] = useState<Screen>("home");
-  const [user, setUser] = useState<UserProfile | null>(null);
   const [selectedItem, setSelectedItem] = useState<SpotOrFestival | null>(null);
   const [selectedBundle, setSelectedBundle] = useState<Bundle | null>(null);
   // 저장된 토큰으로 로그인 세션 복원. 로그인/로그아웃 시 자동 반영된다.
@@ -40,6 +40,8 @@ export function AriangApp() {
   const queryClient = useQueryClient();
   const { data: myTours } = useGetMyTourList({ query: { enabled: isLoggedIn } });
   const savedTrips = (myTours ?? []).map((t) => ({ itemId: t.tourInfo.id }));
+  // 상단바 자녀 칩 표시용 사용자 정보.
+  const { data: userInfo } = useGetUserInfo({ query: { enabled: isLoggedIn } });
 
   const handleSaveTrip = async (item: SpotOrFestival, date: string) => {
     await createMyTour({ tourId: item.id, visitDate: date || null });
@@ -168,7 +170,7 @@ export function AriangApp() {
                 아이랑
               </span>
             </div>
-            {user?.children?.[0] && (
+            {userInfo?.children?.[0] && (
               <div
                 style={{
                   display: "flex",
@@ -187,7 +189,7 @@ export function AriangApp() {
                     color: "var(--primary)",
                   }}
                 >
-                  {user.children[0].name || "아이"}
+                  {userInfo.children[0].name || "아이"}
                 </span>
               </div>
             )}
@@ -249,7 +251,7 @@ export function AriangApp() {
             }}
           >
             {isLoggedIn ? (
-              <SettingsScreen user={user} onUpdateUser={setUser} />
+              <SettingsScreen />
             ) : (
               <LoginScreen />
             )}

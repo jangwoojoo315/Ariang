@@ -7,6 +7,8 @@
 
 export * from './checklistItem';
 export * from './checklistItemInput';
+export * from './child';
+export * from './childInput';
 export * from './createMyTourRequest';
 export * from './createMyTourResponse';
 export * from './deleteMyTourResponse';
@@ -18,5 +20,8 @@ export * from './region';
 export * from './searchHistoryTourParams';
 export * from './successResponse';
 export * from './tourSpot';
+export * from './updateAlarmSettingRequest';
 export * from './updateChecklistRequest';
+export * from './updateChildrenRequest';
 export * from './updateVisitDateRequest';
+export * from './userInfo';

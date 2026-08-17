@@ -244,6 +244,60 @@ paths:
               schema:
                 $ref: '#/components/schemas/SuccessResponse'
 
+  /api/user:
+    get:
+      summary: 사용자 정보 조회
+      operationId: getUserInfo
+      tags:
+        - User
+      responses:
+        '200':
+          description: 성공
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserInfo'
+
+  /api/user/children:
+    patch:
+      summary: 자녀 정보 전체 교체
+      operationId: updateChildren
+      tags:
+        - User
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateChildrenRequest'
+      responses:
+        '200':
+          description: 성공
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+
+  /api/user/alarm:
+    patch:
+      summary: 알림 설정 수정 (안 보낸 필드는 유지)
+      operationId: updateAlarmSetting
+      tags:
+        - User
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateAlarmSettingRequest'
+      responses:
+        '200':
+          description: 성공
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+
 components:
   schemas:
 
@@ -547,6 +601,83 @@ components:
           type: boolean
           example: true
 
+    Child:
+      type: object
+      required:
+        - id
+        - name
+        - birth
+      properties:
+        id:
+          type: string
+          example: "1"
+        name:
+          type: string
+          example: "민준"
+        birth:
+          type: string
+          format: date
+          example: "2022-03-15"
+
+    ChildInput:
+      type: object
+      description: "자녀 정보 수정 요청 항목 (id 없이 전송, 전체 교체)"
+      required:
+        - name
+        - birth
+      properties:
+        name:
+          type: string
+          example: "민준"
+        birth:
+          type: string
+          format: date
+          example: "2022-03-15"
+
+    UserInfo:
+      type: object
+      required:
+        - name
+        - children
+        - dayBeforeTodoEnabled
+        - dayAlarmEnabled
+      properties:
+        name:
+          type: string
+          description: "사용자 이름"
+          example: "홍길동"
+        children:
+          type: array
+          items:
+            $ref: '#/components/schemas/Child'
+        dayBeforeTodoEnabled:
+          type: boolean
+          description: "D-1 알림"
+          example: true
+        dayAlarmEnabled:
+          type: boolean
+          description: "당일 알림"
+          example: true
+
+    UpdateChildrenRequest:
+      type: object
+      required:
+        - children
+      properties:
+        children:
+          type: array
+          items:
+            $ref: '#/components/schemas/ChildInput'
+
+    UpdateAlarmSettingRequest:
+      type: object
+      description: "부분 수정 — 보낸 필드만 반영"
+      properties:
+        dayBeforeTodoEnabled:
+          type: boolean
+        dayAlarmEnabled:
+          type: boolean
+
 tags:
   - name: Home
     description: 홈 화면 API
@@ -554,3 +685,5 @@ tags:
     description: 검색 API
   - name: MyTour
     description: 내 여행 API
+  - name: User
+    description: 사용자/설정 API

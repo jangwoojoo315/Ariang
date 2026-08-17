@@ -1,10 +1,15 @@
 'use client';
 import { useState } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import { Modal, PrimaryBtn } from '@/shared/ui';
 import { useWindowWidth, clearTokens } from '@/shared/lib';
-import type { UserProfile, ChildProfile } from '@/shared/types';
-
-interface Props { user: UserProfile | null; onUpdateUser: (u: UserProfile) => void; }
+import {
+  useGetUserInfo,
+  updateChildren,
+  updateAlarmSetting,
+  getGetUserInfoQueryKey,
+} from '@/shared/api/generated/user/user';
+import type { Child, ChildInput } from '@/shared/api/generated/model';
 
 function Toggle({ active, onChange }: { active: boolean; onChange: () => void }) {
   return (
@@ -36,7 +41,7 @@ function SettingsSection({ title, children, px }: { title:string; children:React
   );
 }
 
-function EditChildModal({ child, onSave, onClose }: { child: ChildProfile; onSave:(c:ChildProfile)=>void; onClose:()=>void }) {
+function EditChildModal({ child, onSave, onClose }: { child: ChildInput; onSave:(c:ChildInput)=>void; onClose:()=>void }) {
   const [form, setForm] = useState(child);
   return (
     <>
@@ -67,14 +72,35 @@ function getAge(birth: string, now: number): string | null {
   return rem > 0 ? `${years}세 ${rem}개월` : `${years}세`;
 }
 
-export function SettingsScreen({ user, onUpdateUser }: Props) {
-  const [notif, setNotif] = useState({ dMinus1:true, dayOf:true, marketing:false });
+export function SettingsScreen() {
+  const qc = useQueryClient();
+  const { data: userInfo, isLoading, isError } = useGetUserInfo();
   const [editingChild, setEditingChild] = useState<number|null>(null);
   const [confirmLogout, setConfirmLogout] = useState(false);
   const [now] = useState(() => Date.now());
   const width = useWindowWidth();
   const isMobile = width < 768;
   const px = isMobile ? 16 : 28;
+
+  const children: Child[] = userInfo?.children ?? [];
+  const invalidate = () =>
+    qc.invalidateQueries({ queryKey: getGetUserInfoQueryKey() });
+
+  // 자녀 정보는 배열 전체 교체(id 없이 {name, birth}만 전송).
+  const saveChildren = async (next: ChildInput[]) => {
+    await updateChildren({ children: next });
+    invalidate();
+  };
+  const toChildInput = (c: Child): ChildInput => ({ name: c.name, birth: c.birth });
+
+  // 알림 설정은 부분 수정(해당 필드만 전송).
+  const toggleAlarm = async (
+    field: 'dayBeforeTodoEnabled' | 'dayAlarmEnabled',
+    value: boolean,
+  ) => {
+    await updateAlarmSetting({ [field]: value });
+    invalidate();
+  };
 
   return (
     <div style={{ height:'100%', overflowY:'auto', paddingBottom: isMobile ? 80 : 24 }} className="no-scroll">
@@ -87,16 +113,24 @@ export function SettingsScreen({ user, onUpdateUser }: Props) {
           <div style={{ display:'flex', alignItems:'center', gap:14, padding:'4px 0 12px' }}>
             <div style={{ width:56, height:56, borderRadius:28, background:'linear-gradient(135deg, var(--primary), var(--secondary))', display:'flex', alignItems:'center', justifyContent:'center', fontSize:28 }}>🌿</div>
             <div>
-              <div style={{ fontWeight:800, fontSize:17 }}>자연 사랑 부모님</div>
+              <div style={{ fontWeight:800, fontSize:17 }}>{userInfo?.name || '사용자'}</div>
               <div style={{ fontSize:13, color:'var(--text2)', marginTop:2 }}>카카오로 로그인 중</div>
             </div>
           </div>
         </SettingsCard>
       </div>
 
+      {isError ? (
+        <div style={{ padding:`24px ${px}px`, color:'var(--text2)', fontSize:14, textAlign:'center' }}>정보를 불러오지 못했어요.</div>
+      ) : (
+      <>
       <SettingsSection title="👶 아이 프로필" px={px}>
-        {(user?.children || []).map((child, i) => (
-          <SettingsRow key={i}
+        {isLoading ? (
+          <div style={{ padding:'16px 0', color:'var(--text2)', fontSize:13 }}>불러오는 중…</div>
+        ) : (
+          <>
+        {children.map((child, i) => (
+          <SettingsRow key={child.id ?? i}
             left={<>
               <div style={{ width:36, height:36, borderRadius:18, background:'var(--tag-bg)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:18, flexShrink:0 }}>🧒</div>
               <div>
@@ -108,23 +142,26 @@ export function SettingsScreen({ user, onUpdateUser }: Props) {
           />
         ))}
         <button style={{ width:'100%', border:'2px dashed var(--border)', borderRadius:12, padding:'11px 0', color:'var(--primary)', fontWeight:600, fontSize:14, marginTop:4, cursor:'pointer' }}
-          onClick={() => onUpdateUser({ ...user, children:[...(user?.children||[]),{name:'',birth:''}] })}>
+          onClick={() => saveChildren([...children.map(toChildInput), { name:'', birth:'' }])}>
           + 아이 추가
         </button>
+          </>
+        )}
       </SettingsSection>
 
       <SettingsSection title="🔔 알림 설정" px={px}>
         {[
-          { key:'dMinus1' as const, title:'D-1 알림', desc:'여행 전날 저녁 8시에 준비물 알림 발송' },
-          { key:'dayOf' as const,   title:'당일 알림', desc:'여행 당일 아침 7시에 체크리스트 요약 발송' },
-          { key:'marketing' as const, title:'추천 알림', desc:'새로운 생태관광지 및 축제 소식 받기' },
+          { key:'dayBeforeTodoEnabled' as const, title:'D-1 알림', desc:'여행 전날 저녁 8시에 준비물 알림 발송' },
+          { key:'dayAlarmEnabled' as const,      title:'당일 알림', desc:'여행 당일 아침 7시에 체크리스트 요약 발송' },
         ].map(({ key, title, desc }) => (
           <SettingsRow key={key}
             left={<><div><div style={{ fontWeight:600, fontSize:15 }}>{title}</div><div style={{ fontSize:12, color:'var(--text2)', marginTop:2 }}>{desc}</div></div></>}
-            right={<Toggle active={notif[key]} onChange={() => setNotif(n=>({...n,[key]:!n[key]}))} />}
+            right={<Toggle active={!!userInfo?.[key]} onChange={() => toggleAlarm(key, !userInfo?.[key])} />}
           />
         ))}
       </SettingsSection>
+      </>
+      )}
 
       <SettingsSection title="앱 정보" px={px}>
         {[
@@ -159,11 +196,11 @@ export function SettingsScreen({ user, onUpdateUser }: Props) {
       {editingChild !== null && (
         <Modal onClose={() => setEditingChild(null)}>
           <EditChildModal
-            child={(user?.children||[])[editingChild] || {name:'',birth:''}}
+            child={toChildInput(children[editingChild] ?? { id:'', name:'', birth:'' })}
             onSave={updated => {
-              const children = [...(user?.children||[])];
-              children[editingChild] = updated;
-              onUpdateUser({...user, children});
+              const next = children.map(toChildInput);
+              next[editingChild] = updated;
+              saveChildren(next);
               setEditingChild(null);
             }}
             onClose={() => setEditingChild(null)}
