@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { HomeScreen } from "@/views/home";
 import { SearchScreen } from "@/views/search";
 import { DetailSheet, BundleDetailSheet } from "@/views/detail";
@@ -8,8 +9,12 @@ import { SettingsScreen } from "@/views/settings";
 import { BundleMakerScreen } from "@/views/bundle-maker";
 import { LoginScreen } from "@/views/auth";
 import { useWindowWidth, useIsAuthenticated } from "@/shared/lib";
-import { DEFAULT_CHECKLISTS } from "@/entities/spot";
-import type { SpotOrFestival, Bundle, Trip, UserProfile } from "@/shared/types";
+import {
+  useGetMyTourList,
+  createMyTour,
+  getGetMyTourListQueryKey,
+} from "@/shared/api/generated/my-tour/my-tour";
+import type { SpotOrFestival, Bundle, UserProfile } from "@/shared/types";
 
 type Screen = "home" | "search" | "bundle" | "trips" | "settings";
 
@@ -26,24 +31,19 @@ export function AriangApp() {
   const [user, setUser] = useState<UserProfile | null>(null);
   const [selectedItem, setSelectedItem] = useState<SpotOrFestival | null>(null);
   const [selectedBundle, setSelectedBundle] = useState<Bundle | null>(null);
-  const [savedTrips, setSavedTrips] = useState<Trip[]>([]);
   // 저장된 토큰으로 로그인 세션 복원. 로그인/로그아웃 시 자동 반영된다.
   const isLoggedIn = useIsAuthenticated();
   const width = useWindowWidth();
   const isDesktop = width >= 768;
 
-  const handleSaveTrip = (item: SpotOrFestival, date: string) => {
-    const defaultItems = (
-      DEFAULT_CHECKLISTS[item.theme] || DEFAULT_CHECKLISTS.forest
-    ).map((label) => ({ label, checked: false }));
-    const trip: Trip = {
-      id: Date.now(),
-      itemId: item.id,
-      item,
-      date,
-      checklist: defaultItems,
-    };
-    setSavedTrips((ts) => [...ts, trip]);
+  // 내 여행 목록(실 API)이 저장 여부·배지 카운트의 단일 소스.
+  const queryClient = useQueryClient();
+  const { data: myTours } = useGetMyTourList({ query: { enabled: isLoggedIn } });
+  const savedTrips = (myTours ?? []).map((t) => ({ itemId: t.tourInfo.id }));
+
+  const handleSaveTrip = async (item: SpotOrFestival, date: string) => {
+    await createMyTour({ tourId: item.id, visitDate: date || null });
+    queryClient.invalidateQueries({ queryKey: getGetMyTourListQueryKey() });
     setScreen("trips");
   };
 

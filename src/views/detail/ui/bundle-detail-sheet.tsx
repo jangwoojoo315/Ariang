@@ -1,14 +1,14 @@
 'use client';
 import { BottomSheet, PrimaryBtn, PlaceholderImg, ThemeChip } from '@/shared/ui';
 import { IcoXClose, IcoClock2, IcoRuler, IcoPin, IcoLightbulb, IcoRoute, IcoStroller, IcoCheckCircle, IcoTent, IcoFestival, IcoUtensils2, IcoHotel } from '@/shared/ui';
-import type { Bundle, SpotOrFestival, Trip } from '@/shared/types';
+import type { Bundle, SpotOrFestival } from '@/shared/types';
 
 function CourseStop({ stop, idx, total, onSelectItem, savedTrips }: {
   stop: Bundle['course'][0];
   idx: number;
   total: number;
   onSelectItem: (item: SpotOrFestival) => void;
-  savedTrips: Trip[];
+  savedTrips: { itemId: string }[];
 }) {
   const isMeal = stop.type === 'meal';
   const isStay = stop.type === 'stay';
@@ -68,7 +68,7 @@ interface Props {
   onClose: () => void;
   onSelectItem: (item: SpotOrFestival) => void;
   onSaveTrip: (item: SpotOrFestival, date: string) => void;
-  savedTrips: Trip[];
+  savedTrips: { itemId: string }[];
 }
 
 export function BundleDetailSheet({ bundle, onClose, onSelectItem, onSaveTrip, savedTrips }: Props) {

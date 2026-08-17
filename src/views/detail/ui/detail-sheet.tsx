@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { BottomSheet, Modal, PrimaryBtn, PlaceholderImg, ThemeChip } from '@/shared/ui';
 import { IcoXClose, IcoCalendar, IcoRoute, IcoCheck2, IcoStroller } from '@/shared/ui';
 import { FESTIVALS } from '@/entities/spot';
-import type { SpotOrFestival, Trip } from '@/shared/types';
+import type { SpotOrFestival } from '@/shared/types';
 
 function IconStroller({ size=22, color='currentColor' }: { size?:number; color?:string }) {
   return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="8" cy="19" r="2"/><circle cx="18" cy="19" r="2"/><path d="M4 4h2l3.5 9H17a2 2 0 0 0 2-2V8H9"/><path d="M9 13H5l-1-4"/></svg>;
@@ -127,7 +127,7 @@ export function TripSaveModal({ item, onClose, onSave }: { item: SpotOrFestival;
   );
 }
 
-export function DetailSheet({ item, onClose, onSaveTrip, savedTrips }: { item: SpotOrFestival; onClose:()=>void; onSaveTrip:(item:SpotOrFestival,date:string)=>void; savedTrips:Trip[] }) {
+export function DetailSheet({ item, onClose, onSaveTrip, savedTrips }: { item: SpotOrFestival; onClose:()=>void; onSaveTrip:(item:SpotOrFestival,date:string)=>void; savedTrips:{ itemId: string }[] }) {
   const [showSave, setShowSave] = useState(false);
   const alreadySaved = savedTrips.some(t => t.itemId === item.id);
 
