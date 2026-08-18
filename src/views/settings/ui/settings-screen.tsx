@@ -41,11 +41,11 @@ function SettingsSection({ title, children, px }: { title:string; children:React
   );
 }
 
-function EditChildModal({ child, onSave, onClose }: { child: ChildInput; onSave:(c:ChildInput)=>void; onClose:()=>void }) {
+function EditChildModal({ child, onSave, onClose, title = '아이 정보 편집' }: { child: ChildInput; onSave:(c:ChildInput)=>void; onClose:()=>void; title?: string }) {
   const [form, setForm] = useState(child);
   return (
     <>
-      <div style={{ fontWeight:800, fontSize:18, marginBottom:18 }}>아이 정보 편집</div>
+      <div style={{ fontWeight:800, fontSize:18, marginBottom:18 }}>{title}</div>
       <div style={{ marginBottom:14 }}>
         <div style={{ fontSize:12, color:'var(--text2)', fontWeight:600, marginBottom:6 }}>이름</div>
         <input value={form.name} onChange={e => setForm(f=>({...f,name:e.target.value}))} placeholder="예: 민준" style={{ width:'100%', border:'1.5px solid var(--border)', borderRadius:10, padding:'10px 12px', fontSize:14, outline:'none' }} />
@@ -76,6 +76,8 @@ export function SettingsScreen() {
   const qc = useQueryClient();
   const { data: userInfo, isLoading, isError } = useGetUserInfo();
   const [editingChild, setEditingChild] = useState<number|null>(null);
+  const [addingChild, setAddingChild] = useState(false);
+  const [deletingChild, setDeletingChild] = useState<number|null>(null);
   const [confirmLogout, setConfirmLogout] = useState(false);
   const [now] = useState(() => Date.now());
   // 토글 즉시 반응용 로컬 상태 (서버 값이 바뀌면 렌더 중 동기화)
@@ -102,6 +104,8 @@ export function SettingsScreen() {
     invalidate();
   };
   const toChildInput = (c: Child): ChildInput => ({ name: c.name, birth: c.birth });
+  const removeChild = (i: number) =>
+    saveChildren(children.map(toChildInput).filter((_, idx) => idx !== i));
 
   // 알림 토글: 로컬 state를 즉시 바꿔 애니메이션이 지연 없이 움직이게 하고,
   // 서버 요청은 뒤에서 처리한다. 실패하면 로컬 값을 되돌린다.
@@ -153,11 +157,14 @@ export function SettingsScreen() {
                 {child.birth && <div style={{ fontSize:12, color:'var(--text2)', marginTop:1 }}>{getAge(child.birth, now)} ({child.birth})</div>}
               </div>
             </>}
-            right={<button onClick={() => setEditingChild(i)} style={{ color:'var(--primary)', fontSize:13, fontWeight:600 }}>편집</button>}
+            right={<div style={{ display:'flex', alignItems:'center', gap:12 }}>
+              <button onClick={() => setEditingChild(i)} style={{ color:'var(--primary)', fontSize:13, fontWeight:600 }}>편집</button>
+              <button onClick={() => setDeletingChild(i)} style={{ color:'#E57373', fontSize:13, fontWeight:600 }}>삭제</button>
+            </div>}
           />
         ))}
         <button style={{ width:'100%', border:'2px dashed var(--border)', borderRadius:12, padding:'11px 0', color:'var(--primary)', fontWeight:600, fontSize:14, marginTop:4, cursor:'pointer' }}
-          onClick={() => saveChildren([...children.map(toChildInput), { name:'', birth:'' }])}>
+          onClick={() => setAddingChild(true)}>
           + 아이 추가
         </button>
           </>
@@ -220,6 +227,33 @@ export function SettingsScreen() {
             }}
             onClose={() => setEditingChild(null)}
           />
+        </Modal>
+      )}
+
+      {addingChild && (
+        <Modal onClose={() => setAddingChild(false)}>
+          <EditChildModal
+            title="아이 추가"
+            child={{ name:'', birth:'' }}
+            onSave={added => {
+              saveChildren([...children.map(toChildInput), added]);
+              setAddingChild(false);
+            }}
+            onClose={() => setAddingChild(false)}
+          />
+        </Modal>
+      )}
+
+      {deletingChild !== null && (
+        <Modal onClose={() => setDeletingChild(null)}>
+          <div style={{ fontWeight:800, fontSize:18, marginBottom:8 }}>아이 정보를 삭제할까요?</div>
+          <div style={{ fontSize:14, color:'var(--text2)', lineHeight:1.6, marginBottom:20 }}>
+            {children[deletingChild]?.name || `아이 ${deletingChild+1}`} 정보가 삭제돼요.
+          </div>
+          <div style={{ display:'flex', gap:10 }}>
+            <button onClick={() => setDeletingChild(null)} style={{ flex:1, padding:'12px 0', borderRadius:12, border:'1.5px solid var(--border)', fontSize:14, fontWeight:600, color:'var(--text2)', cursor:'pointer' }}>취소</button>
+            <button onClick={() => { removeChild(deletingChild); setDeletingChild(null); }} style={{ flex:2, padding:'12px 0', borderRadius:12, border:'none', background:'#E57373', color:'#fff', fontSize:14, fontWeight:700, cursor:'pointer' }}>삭제</button>
+          </div>
         </Modal>
       )}
 
