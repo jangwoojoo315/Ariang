@@ -9,7 +9,7 @@ import {
   updateAlarmSetting,
   getGetUserInfoQueryKey,
 } from '@/shared/api/generated/user/user';
-import type { Child, ChildInput } from '@/shared/api/generated/model';
+import type { Child, ChildInput, UserInfo } from '@/shared/api/generated/model';
 
 function Toggle({ active, onChange }: { active: boolean; onChange: () => void }) {
   return (
@@ -78,6 +78,16 @@ export function SettingsScreen() {
   const [editingChild, setEditingChild] = useState<number|null>(null);
   const [confirmLogout, setConfirmLogout] = useState(false);
   const [now] = useState(() => Date.now());
+  // 토글 즉시 반응용 로컬 상태 (서버 값이 바뀌면 렌더 중 동기화)
+  const [alarm, setAlarm] = useState({ dayBeforeTodoEnabled: false, dayAlarmEnabled: false });
+  const [syncedFrom, setSyncedFrom] = useState<UserInfo | undefined>(undefined);
+  if (userInfo && userInfo !== syncedFrom) {
+    setSyncedFrom(userInfo);
+    setAlarm({
+      dayBeforeTodoEnabled: userInfo.dayBeforeTodoEnabled,
+      dayAlarmEnabled: userInfo.dayAlarmEnabled,
+    });
+  }
   const width = useWindowWidth();
   const isMobile = width < 768;
   const px = isMobile ? 16 : 28;
@@ -93,13 +103,18 @@ export function SettingsScreen() {
   };
   const toChildInput = (c: Child): ChildInput => ({ name: c.name, birth: c.birth });
 
-  // 알림 설정은 부분 수정(해당 필드만 전송).
+  // 알림 토글: 로컬 state를 즉시 바꿔 애니메이션이 지연 없이 움직이게 하고,
+  // 서버 요청은 뒤에서 처리한다. 실패하면 로컬 값을 되돌린다.
   const toggleAlarm = async (
     field: 'dayBeforeTodoEnabled' | 'dayAlarmEnabled',
     value: boolean,
   ) => {
-    await updateAlarmSetting({ [field]: value });
-    invalidate();
+    setAlarm((a) => ({ ...a, [field]: value })); // 즉시 반영(동기)
+    try {
+      await updateAlarmSetting({ [field]: value });
+    } catch {
+      setAlarm((a) => ({ ...a, [field]: !value })); // 롤백
+    }
   };
 
   return (
@@ -156,7 +171,7 @@ export function SettingsScreen() {
         ].map(({ key, title, desc }) => (
           <SettingsRow key={key}
             left={<><div><div style={{ fontWeight:600, fontSize:15 }}>{title}</div><div style={{ fontSize:12, color:'var(--text2)', marginTop:2 }}>{desc}</div></div></>}
-            right={<Toggle active={!!userInfo?.[key]} onChange={() => toggleAlarm(key, !userInfo?.[key])} />}
+            right={<Toggle active={alarm[key]} onChange={() => toggleAlarm(key, !alarm[key])} />}
           />
         ))}
       </SettingsSection>
