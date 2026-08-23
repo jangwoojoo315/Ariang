@@ -1,5 +1,5 @@
 "use client";
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect, useRef } from "react";
 import {
   PlaceholderImg,
   ThemeChip,
@@ -19,10 +19,10 @@ import {
 } from "@/shared/ui";
 import { REGIONS, mapTourSpotToSpot } from "@/entities/spot";
 import { useWindowWidth } from "@/shared/lib";
-import { useSearchHistoryTour } from "@/shared/api/generated/search/search";
+import { useSearchTour } from "@/shared/api/generated/search/search";
 import { REGION_LABELS } from "@/shared/api/region-labels";
 import type {
-  SearchHistoryTourParams,
+  SearchTourParams,
   Depth1,
   Depth2,
   Region,
@@ -33,6 +33,8 @@ import type { SpotOrFestival, FilterState } from "@/shared/types";
 const LABEL_TO_REGION: Record<string, Region> = Object.fromEntries(
   Object.entries(REGION_LABELS).map(([code, label]) => [label, code as Region]),
 );
+
+const PAGE_SIZE = 20; // 페이지당 결과 수
 
 interface Props {
   onSelectItem: (item: SpotOrFestival) => void;
@@ -50,9 +52,18 @@ export function SearchScreen({ onSelectItem }: Props) {
     parking: false,
     accessible: false,
   });
+  const [page, setPage] = useState(1);
   const width = useWindowWidth();
   const isMobile = width < 768;
   const px = isMobile ? 16 : 28;
+
+  // 필터/검색어가 바뀌면 페이지를 1로 리셋 (렌더 단계 동기화 — effect 아님)
+  const filterKey = JSON.stringify({ query, filters });
+  const [prevFilterKey, setPrevFilterKey] = useState(filterKey);
+  if (filterKey !== prevFilterKey) {
+    setPrevFilterKey(filterKey);
+    setPage(1);
+  }
 
   const activeFilterCount = [
     filters.regions.length > 0,
@@ -64,33 +75,40 @@ export function SearchScreen({ onSelectItem }: Props) {
     filters.accessible,
   ].filter(Boolean).length;
 
-  // 화면 필터 상태 → 역사관광지 검색 API query 파라미터
-  // (API는 지역/그룹을 단일 값만 받으므로, 하나만 선택된 경우에만 서버로 넘긴다)
-  const searchParams = useMemo<SearchHistoryTourParams>(() => {
-    const params: SearchHistoryTourParams = {};
+  // 화면 필터 상태 → 검색 API query 파라미터 (page/size 포함)
+  const searchParams = useMemo<SearchTourParams>(() => {
+    const params: SearchTourParams = { page, size: PAGE_SIZE };
     if (query.trim()) params.tourName = query.trim();
     if (filters.stroller) params.isStrollerRental = true;
     if (filters.parking) params.isPark = true;
     if (filters.accessible) params.isToilet = true;
-    if (filters.regions.length === 1) {
-      const region = LABEL_TO_REGION[filters.regions[0]];
-      if (region) params.region = region;
+    if (filters.regions.length) {
+      // 한글 라벨 → Region enum. 선택된 지역 전체를 배열로 전달.
+      const regions = filters.regions
+        .map((label) => LABEL_TO_REGION[label])
+        .filter(Boolean) as Region[];
+      if (regions.length) params.region = regions;
     }
     if (filters.groups.length) params.depth1 = filters.groups as Depth1[];
     if (filters.types.length) params.depth2 = filters.types as Depth2[];
     return params;
-  }, [query, filters]);
+  }, [query, filters, page]);
 
-  const { data, isLoading, isError } = useSearchHistoryTour(searchParams);
+  const { data, isLoading, isError } = useSearchTour(searchParams);
 
-  // API TourSpot[] → 로컬 Spot[]. 여러 지역을 선택한 경우 클라이언트에서 추가 필터링.
-  const filtered = useMemo<SpotOrFestival[]>(() => {
-    const spots = (data ?? []).map((t) => mapTourSpotToSpot(t, "geology"));
-    if (filters.regions.length > 1) {
-      return spots.filter((s) => filters.regions.includes(s.region));
-    }
-    return spots;
-  }, [data, filters.regions]);
+  const totalPages = data?.totalPages ?? 0;
+  const totalElements = data?.totalElements ?? 0;
+  // API 결과(TourSpot[]) → 로컬 Spot[]
+  const filtered = useMemo<SpotOrFestival[]>(
+    () => (data?.items ?? []).map((t) => mapTourSpotToSpot(t, "geology")),
+    [data],
+  );
+
+  // 페이지 이동 시 결과 목록을 맨 위로 스크롤
+  const listRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    listRef.current?.scrollTo({ top: 0 });
+  }, [page]);
 
   return (
     <div style={{ height: "100%", display: "flex", flexDirection: "column" }}>
@@ -167,6 +185,7 @@ export function SearchScreen({ onSelectItem }: Props) {
       </div>
 
       <div
+        ref={listRef}
         style={{
           flex: 1,
           overflowY: "auto",
@@ -185,7 +204,7 @@ export function SearchScreen({ onSelectItem }: Props) {
         >
           {isLoading
             ? "검색 중…"
-            : `${filtered.length}개의 관광지를 찾았어요`}
+            : `${totalElements}개의 관광지를 찾았어요`}
         </div>
         {isLoading ? (
           <div
@@ -245,6 +264,10 @@ export function SearchScreen({ onSelectItem }: Props) {
             ))}
           </div>
         )}
+
+        {!isLoading && !isError && totalPages > 1 && (
+          <Pagination page={page} totalPages={totalPages} onChange={setPage} />
+        )}
       </div>
 
       {showFilters && (
@@ -254,6 +277,84 @@ export function SearchScreen({ onSelectItem }: Props) {
           onClose={() => setShowFilters(false)}
         />
       )}
+    </div>
+  );
+}
+
+function Pagination({
+  page,
+  totalPages,
+  onChange,
+}: {
+  page: number;
+  totalPages: number;
+  onChange: (p: number) => void;
+}) {
+  // 현재 페이지 주변 최대 5개의 페이지 번호를 표시
+  const windowSize = 5;
+  const end = Math.min(totalPages, Math.max(page + 2, windowSize));
+  const start = Math.max(1, Math.min(page - 2, end - windowSize + 1));
+  const pages: number[] = [];
+  for (let i = start; i <= end; i++) pages.push(i);
+
+  const cell = (active: boolean): React.CSSProperties => ({
+    minWidth: 34,
+    height: 34,
+    borderRadius: 10,
+    fontSize: 13,
+    fontWeight: 700,
+    border: `1.5px solid ${active ? "var(--primary)" : "var(--border)"}`,
+    background: active ? "var(--primary)" : "var(--surface)",
+    color: active ? "#fff" : "var(--text2)",
+    padding: "0 8px",
+    cursor: "pointer",
+  });
+  const nav = (disabled: boolean): React.CSSProperties => ({
+    ...cell(false),
+    opacity: disabled ? 0.4 : 1,
+    cursor: disabled ? "not-allowed" : "pointer",
+  });
+
+  return (
+    <div
+      style={{
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        gap: 6,
+        marginTop: 24,
+        flexWrap: "wrap",
+      }}
+    >
+      <button style={nav(page <= 1)} disabled={page <= 1} onClick={() => onChange(page - 1)}>
+        ‹
+      </button>
+      {start > 1 && (
+        <>
+          <button style={cell(false)} onClick={() => onChange(1)}>1</button>
+          {start > 2 && <span style={{ color: "var(--text3)" }}>…</span>}
+        </>
+      )}
+      {pages.map((p) => (
+        <button key={p} style={cell(p === page)} onClick={() => onChange(p)}>
+          {p}
+        </button>
+      ))}
+      {end < totalPages && (
+        <>
+          {end < totalPages - 1 && <span style={{ color: "var(--text3)" }}>…</span>}
+          <button style={cell(false)} onClick={() => onChange(totalPages)}>
+            {totalPages}
+          </button>
+        </>
+      )}
+      <button
+        style={nav(page >= totalPages)}
+        disabled={page >= totalPages}
+        onClick={() => onChange(page + 1)}
+      >
+        ›
+      </button>
     </div>
   );
 }

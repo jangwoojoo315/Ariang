@@ -20,8 +20,8 @@ import type {
 } from '@tanstack/react-query';
 
 import type {
-  SearchHistoryTourParams,
-  TourSpot
+  SearchResult,
+  SearchTourParams
 } from '../model';
 
 import { customInstance } from '../../mutator';
@@ -45,16 +45,16 @@ const withQueryKey = <T extends object, K>(query: T, queryKey: K): T & { queryKe
 };
 
 /**
- * @summary 역사관광지 검색
+ * @summary 관광지 검색
  */
-export const searchHistoryTour = (
-    params?: SearchHistoryTourParams,
+export const searchTour = (
+    params?: SearchTourParams,
  signal?: AbortSignal
 ) => {
 
 
-      return customInstance<TourSpot[]>(
-      {url: `/api/search/history`, method: 'GET',
+      return customInstance<SearchResult>(
+      {url: `/api/search`, method: 'GET',
         params, signal
     },
       );
@@ -63,69 +63,69 @@ export const searchHistoryTour = (
 
 
 
-export const getSearchHistoryTourQueryKey = (params?: SearchHistoryTourParams,) => {
+export const getSearchTourQueryKey = (params?: SearchTourParams,) => {
     return [
-    `/api/search/history`, ...(params ? [params] : [])
+    `/api/search`, ...(params ? [params] : [])
     ] as const;
     }
 
 
-export const getSearchHistoryTourQueryOptions = <TData = Awaited<ReturnType<typeof searchHistoryTour>>, TError = unknown>(params?: SearchHistoryTourParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof searchHistoryTour>>, TError, TData>>, }
+export const getSearchTourQueryOptions = <TData = Awaited<ReturnType<typeof searchTour>>, TError = unknown>(params?: SearchTourParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof searchTour>>, TError, TData>>, }
 ) => {
 
 const {query: queryOptions} = options ?? {};
 
-  const queryKey =  queryOptions?.queryKey ?? getSearchHistoryTourQueryKey(params);
+  const queryKey =  queryOptions?.queryKey ?? getSearchTourQueryKey(params);
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof searchHistoryTour>>> = ({ signal }) => searchHistoryTour(params, signal);
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof searchTour>>> = ({ signal }) => searchTour(params, signal);
 
 
 
 
 
-   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof searchHistoryTour>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof searchTour>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
 
-export type SearchHistoryTourQueryResult = NonNullable<Awaited<ReturnType<typeof searchHistoryTour>>>
-export type SearchHistoryTourQueryError = unknown
+export type SearchTourQueryResult = NonNullable<Awaited<ReturnType<typeof searchTour>>>
+export type SearchTourQueryError = unknown
 
 
-export function useSearchHistoryTour<TData = Awaited<ReturnType<typeof searchHistoryTour>>, TError = unknown>(
- params: undefined |  SearchHistoryTourParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof searchHistoryTour>>, TError, TData>> & Pick<
+export function useSearchTour<TData = Awaited<ReturnType<typeof searchTour>>, TError = unknown>(
+ params: undefined |  SearchTourParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof searchTour>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
-          Awaited<ReturnType<typeof searchHistoryTour>>,
+          Awaited<ReturnType<typeof searchTour>>,
           TError,
-          Awaited<ReturnType<typeof searchHistoryTour>>
+          Awaited<ReturnType<typeof searchTour>>
         > , 'initialData'
       >, }
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useSearchHistoryTour<TData = Awaited<ReturnType<typeof searchHistoryTour>>, TError = unknown>(
- params?: SearchHistoryTourParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof searchHistoryTour>>, TError, TData>> & Pick<
+export function useSearchTour<TData = Awaited<ReturnType<typeof searchTour>>, TError = unknown>(
+ params?: SearchTourParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof searchTour>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
-          Awaited<ReturnType<typeof searchHistoryTour>>,
+          Awaited<ReturnType<typeof searchTour>>,
           TError,
-          Awaited<ReturnType<typeof searchHistoryTour>>
+          Awaited<ReturnType<typeof searchTour>>
         > , 'initialData'
       >, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useSearchHistoryTour<TData = Awaited<ReturnType<typeof searchHistoryTour>>, TError = unknown>(
- params?: SearchHistoryTourParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof searchHistoryTour>>, TError, TData>>, }
+export function useSearchTour<TData = Awaited<ReturnType<typeof searchTour>>, TError = unknown>(
+ params?: SearchTourParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof searchTour>>, TError, TData>>, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 /**
- * @summary 역사관광지 검색
+ * @summary 관광지 검색
  */
 
-export function useSearchHistoryTour<TData = Awaited<ReturnType<typeof searchHistoryTour>>, TError = unknown>(
- params?: SearchHistoryTourParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof searchHistoryTour>>, TError, TData>>, }
+export function useSearchTour<TData = Awaited<ReturnType<typeof searchTour>>, TError = unknown>(
+ params?: SearchTourParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof searchTour>>, TError, TData>>, }
  , queryClient?: QueryClient
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
-  const queryOptions = getSearchHistoryTourQueryOptions(params,options)
+  const queryOptions = getSearchTourQueryOptions(params,options)
 
   const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 

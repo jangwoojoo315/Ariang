@@ -8,15 +8,29 @@ import type { Depth1 } from './depth1';
 import type { Depth2 } from './depth2';
 import type { Region } from './region';
 
-export type SearchHistoryTourParams = {
+export type SearchTourParams = {
+/**
+ * 페이지 번호(1부터 시작).
+ * @minimum 1
+ */
+page?: number;
+/**
+ * 페이지당 결과 수(기본 50, 최대 100).
+ * @minimum 1
+ * @maximum 100
+ */
+size?: number;
 isStrollerRental?: boolean;
 isPark?: boolean;
 isToilet?: boolean;
-region?: Region;
+region?: Region[];
 /**
  * 관광지 이름
  */
 tourName?: string;
+/**
+ * 미지정 시 전체 카테고리(역사/자연/체험)를 대상으로 한다.
+ */
 depth1?: Depth1[];
 depth2?: Depth2[];
 };
