@@ -329,7 +329,6 @@ export function AriangApp() {
           item={selectedItem}
           onClose={() => setSelectedItem(null)}
           onSaveTrip={handleSaveTrip}
-          savedTrips={savedTrips}
         />
       )}
 

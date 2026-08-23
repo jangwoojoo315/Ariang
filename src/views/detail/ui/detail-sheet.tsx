@@ -127,9 +127,8 @@ export function TripSaveModal({ item, onClose, onSave }: { item: SpotOrFestival;
   );
 }
 
-export function DetailSheet({ item, onClose, onSaveTrip, savedTrips }: { item: SpotOrFestival; onClose:()=>void; onSaveTrip:(item:SpotOrFestival,date:string)=>void; savedTrips:{ itemId: string }[] }) {
+export function DetailSheet({ item, onClose, onSaveTrip }: { item: SpotOrFestival; onClose:()=>void; onSaveTrip:(item:SpotOrFestival,date:string)=>void }) {
   const [showSave, setShowSave] = useState(false);
-  const alreadySaved = savedTrips.some(t => t.itemId === item.id);
 
   return (
     <>
@@ -205,10 +204,10 @@ export function DetailSheet({ item, onClose, onSaveTrip, savedTrips }: { item: S
             )}
           </div>
 
-          <PrimaryBtn onClick={() => setShowSave(true)} disabled={alreadySaved} style={{ background: alreadySaved ? '#B8D4C4' : undefined }}>
+          <PrimaryBtn onClick={() => setShowSave(true)}>
             <span style={{ display:'flex', alignItems:'center', justifyContent:'center', gap:8 }}>
               <IconCalendarDet size={18} color="#fff" />
-              {alreadySaved ? '이미 저장된 여행지예요' : '내 여행에 추가하기'}
+              내 여행에 추가하기
             </span>
           </PrimaryBtn>
         </div>
