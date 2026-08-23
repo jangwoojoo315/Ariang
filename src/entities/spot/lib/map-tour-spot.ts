@@ -25,5 +25,7 @@ export function mapTourSpotToSpot(t: TourSpot, theme: Theme): Spot {
     admission: t.price ?? '',
     isNew: false,
     distance: 0,
+    latitude: t.latitude,
+    longitude: t.longitude,
   };
 }

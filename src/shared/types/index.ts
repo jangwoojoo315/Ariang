@@ -38,6 +38,8 @@ export interface Spot {
   safety?: string;
   isNew: boolean;
   distance: number;
+  latitude?: number;
+  longitude?: number;
   dateRange?: never;
 }
 

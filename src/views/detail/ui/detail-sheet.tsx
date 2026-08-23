@@ -1,6 +1,6 @@
 'use client';
 import { useState } from 'react';
-import { BottomSheet, Modal, PrimaryBtn, PlaceholderImg, ThemeChip } from '@/shared/ui';
+import { BottomSheet, Modal, PrimaryBtn, PlaceholderImg, ThemeChip, KakaoMap } from '@/shared/ui';
 import { IcoXClose, IcoCalendar, IcoRoute, IcoCheck2, IcoStroller } from '@/shared/ui';
 import { FESTIVALS } from '@/entities/spot';
 import type { SpotOrFestival } from '@/shared/types';
@@ -191,10 +191,18 @@ export function DetailSheet({ item, onClose, onSaveTrip, savedTrips }: { item: S
           </div>
 
           <div style={{ borderRadius:14, overflow:'hidden', marginBottom:20, border:'1px solid var(--border)' }}>
-            <div style={{ background:'#EAE8E4', height:130, display:'flex', alignItems:'center', justifyContent:'center', flexDirection:'column', gap:8 }}>
-              <IconMap size={32} color="#A0A0A0" />
-              <div style={{ fontSize:12, color:'var(--text2)' }}>지도 ({item.region})</div>
-            </div>
+            {item.latitude != null && item.longitude != null ? (
+              <KakaoMap
+                center={{ lat: item.latitude, lng: item.longitude }}
+                markers={[{ lat: item.latitude, lng: item.longitude, name: item.name }]}
+                height={180}
+              />
+            ) : (
+              <div style={{ background:'#EAE8E4', height:130, display:'flex', alignItems:'center', justifyContent:'center', flexDirection:'column', gap:8 }}>
+                <IconMap size={32} color="#A0A0A0" />
+                <div style={{ fontSize:12, color:'var(--text2)' }}>위치 정보가 없어요</div>
+              </div>
+            )}
           </div>
 
           <PrimaryBtn onClick={() => setShowSave(true)} disabled={alreadySaved} style={{ background: alreadySaved ? '#B8D4C4' : undefined }}>

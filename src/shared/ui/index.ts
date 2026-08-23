@@ -8,3 +8,4 @@ export * from './section-header';
 export * from './bottom-sheet';
 export * from './modal';
 export * from './primary-btn';
+export * from './kakao-map';
