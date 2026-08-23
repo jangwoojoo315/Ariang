@@ -114,7 +114,16 @@ function TripCard({ trip, onSelect, onDelete, onSelectItem, onUpdateDate }: {
   const done = checklist.filter(i => i.checked).length;
   const total = checklist.length;
   const pct = total > 0 ? Math.round(done/total*100) : 0;
-  const daysUntil = date ? Math.ceil((new Date(date).getTime() - new Date().getTime()) / 86400000) : null;
+  // 달력 날짜(로컬 자정) 기준 남은 일수. 지난 날짜는 음수 → 배지 미표시.
+  const daysUntil = (() => {
+    if (!date) return null;
+    const [y, m, d] = date.split('-').map(Number);
+    if (!y || !m || !d) return null;
+    const target = new Date(y, m - 1, d);
+    const now = new Date();
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    return Math.round((target.getTime() - today.getTime()) / 86400000);
+  })();
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [showDateEdit, setShowDateEdit] = useState(false);
 
