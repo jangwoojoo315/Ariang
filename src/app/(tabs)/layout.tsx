@@ -17,7 +17,7 @@ import { TabsProvider } from "./tabs-context";
 
 const NAV = [
   { path: "/", label: "홈" },
-  { path: "/search", label: "탐색" },
+  { path: "/search", label: "검색" },
   { path: "/trips", label: "내 여행" },
   { path: "/settings", label: "설정" },
 ];

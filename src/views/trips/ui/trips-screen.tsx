@@ -80,7 +80,7 @@ export function TripsScreen({ onSelectItem }: Props) {
           <div style={{ display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', paddingTop:80, textAlign:'center' }}>
             <div style={{ marginBottom:16 }}><IcoRoute size={56} color="var(--border)" /></div>
             <div style={{ fontWeight:700, fontSize:18, marginBottom:8 }}>아직 저장된 여행이 없어요</div>
-            <div style={{ color:'var(--text2)', fontSize:14, lineHeight:1.65 }}>탐색 탭에서 마음에 드는 생태관광지나<br />축제를 저장해 보세요!</div>
+            <div style={{ color:'var(--text2)', fontSize:14, lineHeight:1.65 }}>검색 탭에서 마음에 드는 생태관광지나<br />축제를 저장해 보세요!</div>
           </div>
         ) : (
           <div>
