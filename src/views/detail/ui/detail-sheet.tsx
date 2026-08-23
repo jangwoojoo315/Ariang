@@ -127,7 +127,7 @@ export function TripSaveModal({ item, onClose, onSave }: { item: SpotOrFestival;
   );
 }
 
-export function DetailSheet({ item, onClose, onSaveTrip }: { item: SpotOrFestival; onClose:()=>void; onSaveTrip:(item:SpotOrFestival,date:string)=>void }) {
+export function DetailSheet({ item, onClose, onSaveTrip }: { item: SpotOrFestival; onClose:()=>void; onSaveTrip:(item:SpotOrFestival,date:string)=>Promise<boolean> }) {
   const [showSave, setShowSave] = useState(false);
 
   return (
@@ -215,7 +215,13 @@ export function DetailSheet({ item, onClose, onSaveTrip }: { item: SpotOrFestiva
 
       {showSave && (
         <TripSaveModal item={item} onClose={() => setShowSave(false)}
-          onSave={date => { onSaveTrip(item, date); setShowSave(false); onClose(); }} />
+          onSave={async date => {
+            const ok = await onSaveTrip(item, date);
+            setShowSave(false);
+            // 성공 시에만 상세 시트를 닫는다. 실패(중복 등) 시 시트를 유지한 채
+            // 상위의 알림 다이얼로그가 이 화면 위에 표시된다.
+            if (ok) onClose();
+          }} />
       )}
     </>
   );

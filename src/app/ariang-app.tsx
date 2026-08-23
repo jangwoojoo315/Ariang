@@ -8,6 +8,7 @@ import { TripsScreen } from "@/views/trips";
 import { SettingsScreen } from "@/views/settings";
 import { BundleMakerScreen } from "@/views/bundle-maker";
 import { LoginScreen } from "@/views/auth";
+import { Modal, PrimaryBtn } from "@/shared/ui";
 import { useWindowWidth, useIsAuthenticated } from "@/shared/lib";
 import {
   useGetMyTourList,
@@ -31,6 +32,7 @@ export function AriangApp() {
   const [screen, setScreen] = useState<Screen>("home");
   const [selectedItem, setSelectedItem] = useState<SpotOrFestival | null>(null);
   const [selectedBundle, setSelectedBundle] = useState<Bundle | null>(null);
+  const [saveError, setSaveError] = useState<string | null>(null);
   // 저장된 토큰으로 로그인 세션 복원. 로그인/로그아웃 시 자동 반영된다.
   const isLoggedIn = useIsAuthenticated();
   const width = useWindowWidth();
@@ -43,10 +45,23 @@ export function AriangApp() {
   // 상단바 자녀 칩 표시용 사용자 정보.
   const { data: userInfo } = useGetUserInfo({ query: { enabled: isLoggedIn } });
 
-  const handleSaveTrip = async (item: SpotOrFestival, date: string) => {
-    await createMyTour({ tourId: item.id, visitDate: date || null });
-    queryClient.invalidateQueries({ queryKey: getGetMyTourListQueryKey() });
-    setScreen("trips");
+  // 저장 성공 여부를 반환 → 호출부(상세 시트)가 성공 시에만 닫도록 함.
+  const handleSaveTrip = async (
+    item: SpotOrFestival,
+    date: string,
+  ): Promise<boolean> => {
+    try {
+      await createMyTour({ tourId: item.id, visitDate: date || null });
+      queryClient.invalidateQueries({ queryKey: getGetMyTourListQueryKey() });
+      setScreen("trips");
+      return true;
+    } catch (e) {
+      // 중복 담기(409) 등 → 백엔드가 준 message를 다이얼로그로 노출
+      const message = (e as { response?: { data?: { message?: string } } })
+        ?.response?.data?.message;
+      setSaveError(message ?? "여행지 저장에 실패했어요. 잠시 후 다시 시도해 주세요.");
+      return false;
+    }
   };
 
   return (
@@ -330,6 +345,17 @@ export function AriangApp() {
           onClose={() => setSelectedItem(null)}
           onSaveTrip={handleSaveTrip}
         />
+      )}
+
+      {/* 여행지 저장 실패(중복 담기 등) 알림 */}
+      {saveError && (
+        <Modal onClose={() => setSaveError(null)}>
+          <div style={{ fontWeight: 800, fontSize: 18, marginBottom: 8 }}>알림</div>
+          <div style={{ fontSize: 14, color: "var(--text2)", lineHeight: 1.6, marginBottom: 20 }}>
+            {saveError}
+          </div>
+          <PrimaryBtn onClick={() => setSaveError(null)}>확인</PrimaryBtn>
+        </Modal>
       )}
 
       {/* Bundle detail sheet */}
