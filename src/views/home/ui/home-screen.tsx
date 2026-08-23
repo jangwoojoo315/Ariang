@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import { mapTourSpotToSpot } from "@/entities/spot";
 import { REGION_LABELS } from "@/shared/api/region-labels";
@@ -140,14 +140,33 @@ function HeroBanner({
   const n = slides.length;
   const [index, setIndex] = useState(0);
   const [anim, setAnim] = useState(true);
+  const [visible, setVisible] = useState(true);
+  const boxRef = useRef<HTMLDivElement>(null);
   const minHeight = isMobile ? 220 : 340;
 
-  // 5초마다 다음 슬라이드로 (2개 이상일 때만 자동 순환)
+  // 배너가 화면에 보일 때만 자동 전진한다.
+  // (홈이 다른 화면에 가려지면 display:none → 트랜지션·transitionend가 멈춰
+  //  index 리셋이 안 되고 계속 증가 → 복귀 시 빈 배너가 되던 문제 방지)
   useEffect(() => {
-    if (n <= 1) return;
+    const el = boxRef.current;
+    if (!el) return;
+    const io = new IntersectionObserver(([e]) => {
+      setVisible(e.isIntersecting);
+      if (!e.isIntersecting) {
+        setAnim(false);
+        setIndex(0); // 숨겨지면 처음으로 되돌려 복귀 시 항상 슬라이드0부터
+      }
+    });
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+
+  // 보이는 동안에만 5초마다 다음 슬라이드로 (2개 이상일 때)
+  useEffect(() => {
+    if (!visible || n <= 1) return;
     const id = setInterval(() => setIndex((i) => i + 1), 5000);
     return () => clearInterval(id);
-  }, [n]);
+  }, [visible, n]);
 
   // 마지막(첫 슬라이드 클론) 도달 후 애니메이션 없이 처음으로 스냅 → 무한 순환
   useEffect(() => {
@@ -169,7 +188,7 @@ function HeroBanner({
   const extended = [...slides, slides[0]];
 
   return (
-    <div style={{ position: "relative", overflow: "hidden", minHeight }}>
+    <div ref={boxRef} style={{ position: "relative", overflow: "hidden", minHeight }}>
       <div
         onTransitionEnd={() => {
           if (index === n) {
