@@ -17,4 +17,6 @@ export interface MyTour {
   visitDate?: string | null;
   tourInfo: TourSpot;
   checklist: ChecklistItem[];
+  /** 톡캘린더에 등록되어 있는지 여부 */
+  calendarLinked: boolean;
 }

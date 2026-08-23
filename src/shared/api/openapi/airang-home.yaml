@@ -262,6 +262,36 @@ paths:
               schema:
                 $ref: '#/components/schemas/SuccessResponse'
 
+  /api/my-tour/{id}/calendar:
+    post:
+      summary: 내 여행 항목을 톡캘린더에 등록/갱신
+      operationId: registerMyTourCalendar
+      tags:
+        - Calendar
+      description: 최초 호출 시 일정 생성, 이미 연동된 항목이면 갱신. 미동의 사용자면 428과
+        authorizeUrl을 반환한다.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: 내 여행 id
+          schema:
+            type: integer
+            format: int64
+        - name: dev
+          in: query
+          required: false
+          description: true면 동의 완료 후 로컬 개발 프론트로 콜백
+          schema:
+            type: boolean
+      responses:
+        '200':
+          description: 등록/갱신 성공
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CalendarLinkResponse'
+
   /api/user:
     get:
       summary: 사용자 정보 조회
@@ -554,6 +584,7 @@ components:
         - id
         - tourInfo
         - checklist
+        - calendarLinked
       properties:
         id:
           type: integer
@@ -572,6 +603,10 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/ChecklistItem'
+        calendarLinked:
+          type: boolean
+          description: "톡캘린더에 등록되어 있는지 여부"
+          example: false
 
     CreateMyTourRequest:
       type: object
@@ -642,6 +677,21 @@ components:
         - success
       properties:
         success:
+          type: boolean
+          example: true
+
+    CalendarLinkResponse:
+      type: object
+      required:
+        - id
+        - calendarLinked
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: "내 여행 id"
+          example: 42
+        calendarLinked:
           type: boolean
           example: true
 
@@ -729,5 +779,7 @@ tags:
     description: 검색 API
   - name: MyTour
     description: 내 여행 API
+  - name: Calendar
+    description: 카카오 톡캘린더 연동 API
   - name: User
     description: 사용자/설정 API

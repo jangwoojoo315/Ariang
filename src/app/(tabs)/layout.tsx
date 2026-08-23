@@ -11,9 +11,13 @@ import {
   createMyTour,
   getGetMyTourListQueryKey,
 } from "@/shared/api/generated/my-tour/my-tour";
+import { registerMyTourCalendar } from "@/shared/api/generated/calendar/calendar";
 import { useGetUserInfo } from "@/shared/api/generated/user/user";
+import { PENDING_CALENDAR_TOUR_ID } from "@/shared/lib";
 import type { SpotOrFestival, Bundle } from "@/shared/types";
 import { TabsProvider } from "./tabs-context";
+
+const IS_DEV = process.env.NODE_ENV === "development";
 
 const NAV = [
   { path: "/", label: "홈" },
@@ -44,14 +48,44 @@ export default function TabsLayout({ children }: { children: React.ReactNode }) 
   // 상단바 자녀 칩 표시용 사용자 정보.
   const { data: userInfo } = useGetUserInfo({ query: { enabled: isLoggedIn } });
 
+  // 캘린더 등록 시도. 동의가 필요하면(428) 카카오 동의 화면으로 리다이렉트한다.
+  // 반환값 true = 리다이렉트됨(이후 콜백 페이지에서 재개), false = 그대로 진행.
+  const tryRegisterCalendar = async (myTourId: number): Promise<boolean> => {
+    try {
+      await registerMyTourCalendar(myTourId, IS_DEV ? { dev: true } : undefined);
+      queryClient.invalidateQueries({ queryKey: getGetMyTourListQueryKey() });
+      return false;
+    } catch (e) {
+      const res = (e as { response?: { status?: number; data?: { authorizeUrl?: string } } })
+        ?.response;
+      if (res?.status === 428 && res.data?.authorizeUrl) {
+        // 동의 후 콜백 페이지에서 이어서 등록할 항목 id 저장
+        sessionStorage.setItem(PENDING_CALENDAR_TOUR_ID, String(myTourId));
+        window.location.href = res.data.authorizeUrl;
+        return true;
+      }
+      // 400(방문일 없음)·502 등: 저장은 이미 완료됐으므로 조용히 무시
+      console.warn("톡캘린더 등록 실패:", e);
+      return false;
+    }
+  };
+
   // 저장 성공 여부를 반환 → 호출부(상세 시트)가 성공 시에만 닫도록 함.
   const handleSaveTrip = async (
     item: SpotOrFestival,
     date: string,
   ): Promise<boolean> => {
     try {
-      await createMyTour({ tourId: item.id, visitDate: date || null });
+      const created = await createMyTour({
+        tourId: item.id,
+        visitDate: date || null,
+      });
       queryClient.invalidateQueries({ queryKey: getGetMyTourListQueryKey() });
+      // 방문일이 있으면 캘린더 등록까지 자동 진행
+      if (date) {
+        const redirected = await tryRegisterCalendar(created.id);
+        if (redirected) return true; // 동의 리다이렉트 중 — 콜백에서 이어감
+      }
       router.push("/trips");
       return true;
     } catch (e) {

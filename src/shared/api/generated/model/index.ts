@@ -5,6 +5,7 @@
  * OpenAPI spec version: 0.0.1
  */
 
+export * from './calendarLinkResponse';
 export * from './checklistItem';
 export * from './checklistItemInput';
 export * from './child';
@@ -17,6 +18,7 @@ export * from './depth2';
 export * from './myTour';
 export * from './recentPlace';
 export * from './region';
+export * from './registerMyTourCalendarParams';
 export * from './searchResult';
 export * from './searchTourParams';
 export * from './successResponse';
