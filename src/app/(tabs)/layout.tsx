@@ -36,6 +36,7 @@ export default function TabsLayout({ children }: { children: React.ReactNode }) 
   const [selectedItem, setSelectedItem] = useState<SpotOrFestival | null>(null);
   const [selectedBundle, setSelectedBundle] = useState<Bundle | null>(null);
   const [saveError, setSaveError] = useState<string | null>(null);
+  const [loginNeeded, setLoginNeeded] = useState(false);
 
   const isLoggedIn = useIsAuthenticated();
   const width = useWindowWidth();
@@ -70,11 +71,24 @@ export default function TabsLayout({ children }: { children: React.ReactNode }) 
     }
   };
 
+  // 로그인 안내 후 로그인 페이지(게이트)로 이동
+  const goLogin = () => {
+    setLoginNeeded(false);
+    setSelectedItem(null);
+    setSelectedBundle(null);
+    router.push("/trips");
+  };
+
   // 저장 성공 여부를 반환 → 호출부(상세 시트)가 성공 시에만 닫도록 함.
   const handleSaveTrip = async (
     item: SpotOrFestival,
     date: string,
   ): Promise<boolean> => {
+    // 카카오 로그인 필요 기능 — 미로그인 시 안내 후 로그인 페이지로
+    if (!isLoggedIn) {
+      setLoginNeeded(true);
+      return false;
+    }
     try {
       const created = await createMyTour({
         tourId: item.id,
@@ -297,6 +311,17 @@ export default function TabsLayout({ children }: { children: React.ReactNode }) 
               {saveError}
             </div>
             <PrimaryBtn onClick={() => setSaveError(null)}>확인</PrimaryBtn>
+          </Modal>
+        )}
+
+        {/* 로그인 필요 안내 */}
+        {loginNeeded && (
+          <Modal onClose={() => setLoginNeeded(false)}>
+            <div style={{ fontWeight: 800, fontSize: 18, marginBottom: 8 }}>로그인이 필요해요</div>
+            <div style={{ fontSize: 14, color: "var(--text2)", lineHeight: 1.6, marginBottom: 20 }}>
+              카카오 로그인이 필요한 기능입니다. 로그인 페이지로 이동합니다.
+            </div>
+            <PrimaryBtn onClick={goLogin}>로그인하러 가기</PrimaryBtn>
           </Modal>
         )}
 
