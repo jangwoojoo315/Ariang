@@ -49,9 +49,10 @@ function InfoRow({ icon, label, value, last }: { icon: React.ReactNode; label:st
   );
 }
 
-export function TripSaveModal({ item, onClose, onSave }: { item: SpotOrFestival; onClose: ()=>void; onSave:(date:string)=>void }) {
+export function TripSaveModal({ item, onClose, onSave }: { item: SpotOrFestival; onClose: ()=>void; onSave:(date:string, useRecommendedItems:boolean)=>void }) {
   const [date, setDate] = useState('');
   const [undecided, setUndecided] = useState(true);
+  const [useRecommended, setUseRecommended] = useState(true);
   const today = new Date().toISOString().slice(0,10);
 
   const suggested = 'dateRange' in item
@@ -115,9 +116,22 @@ export function TripSaveModal({ item, onClose, onSave }: { item: SpotOrFestival;
         </div>
       )}
 
+      <button
+        onClick={() => setUseRecommended(v => !v)}
+        style={{ display:'flex', alignItems:'center', gap:10, width:'100%', padding:'12px 14px', borderRadius:12, border:'1.5px solid var(--border)', background:'var(--bg)', marginBottom:16, cursor:'pointer', textAlign:'left' }}
+      >
+        <div style={{ width:22, height:22, borderRadius:6, flexShrink:0, border:`2px solid ${useRecommended ? 'var(--primary)' : '#CCC'}`, background: useRecommended ? 'var(--primary)' : 'transparent', display:'flex', alignItems:'center', justifyContent:'center', transition:'all 0.15s' }}>
+          {useRecommended && <IcoCheck2 size={12} color="#fff" />}
+        </div>
+        <div>
+          <div style={{ fontSize:14, fontWeight:700 }}>추천 준비물 함께 담기</div>
+          <div style={{ fontSize:12, color:'var(--text2)', marginTop:2 }}>여행지에 맞는 준비물 체크리스트를 자동으로 추가해요</div>
+        </div>
+      </button>
+
       <div style={{ display:'flex', gap:10 }}>
         <button onClick={onClose} style={{ flex:1, padding:'13px 0', borderRadius:14, border:'1.5px solid var(--border)', fontSize:14, fontWeight:600, color:'var(--text2)', background:'var(--bg)', cursor:'pointer' }}>취소</button>
-        <PrimaryBtn onClick={() => onSave(undecided ? '' : date)} style={{ flex:2 } as React.CSSProperties}>
+        <PrimaryBtn onClick={() => onSave(undecided ? '' : date, useRecommended)} style={{ flex:2 } as React.CSSProperties}>
           <span style={{ display:'flex', alignItems:'center', justifyContent:'center', gap:6 }}>
             <IcoCheck2 size={15} color="#fff" />저장하기
           </span>
@@ -127,7 +141,7 @@ export function TripSaveModal({ item, onClose, onSave }: { item: SpotOrFestival;
   );
 }
 
-export function DetailSheet({ item, onClose, onSaveTrip }: { item: SpotOrFestival; onClose:()=>void; onSaveTrip:(item:SpotOrFestival,date:string)=>Promise<boolean> }) {
+export function DetailSheet({ item, onClose, onSaveTrip }: { item: SpotOrFestival; onClose:()=>void; onSaveTrip:(item:SpotOrFestival,date:string,useRecommendedItems?:boolean)=>Promise<boolean> }) {
   const [showSave, setShowSave] = useState(false);
 
   return (
@@ -215,8 +229,8 @@ export function DetailSheet({ item, onClose, onSaveTrip }: { item: SpotOrFestiva
 
       {showSave && (
         <TripSaveModal item={item} onClose={() => setShowSave(false)}
-          onSave={async date => {
-            const ok = await onSaveTrip(item, date);
+          onSave={async (date, useRecommendedItems) => {
+            const ok = await onSaveTrip(item, date, useRecommendedItems);
             setShowSave(false);
             // 성공 시에만 상세 시트를 닫는다. 실패(중복 등) 시 시트를 유지한 채
             // 상위의 알림 다이얼로그가 이 화면 위에 표시된다.

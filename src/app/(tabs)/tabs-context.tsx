@@ -7,7 +7,11 @@ import type { SpotOrFestival, Bundle } from '@/shared/types';
 export interface TabsContextValue {
   onSelectItem: (item: SpotOrFestival) => void;
   onSelectBundle: (bundle: Bundle) => void;
-  onSaveTrip: (item: SpotOrFestival, date: string) => Promise<boolean>;
+  onSaveTrip: (
+    item: SpotOrFestival,
+    date: string,
+    useRecommendedItems?: boolean,
+  ) => Promise<boolean>;
   savedTrips: { itemId: string }[];
 }
 

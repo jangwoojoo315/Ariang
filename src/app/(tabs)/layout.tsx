@@ -57,6 +57,7 @@ export default function TabsLayout({ children }: { children: React.ReactNode }) 
   const handleSaveTrip = async (
     item: SpotOrFestival,
     date: string,
+    useRecommendedItems = false,
   ): Promise<boolean> => {
     // 카카오 로그인 필요 기능 — 미로그인 시 안내 후 로그인 페이지로
     if (!isLoggedIn) {
@@ -65,7 +66,11 @@ export default function TabsLayout({ children }: { children: React.ReactNode }) 
     }
     try {
       // 캘린더 등록은 백엔드가 이 요청 처리 시 자동으로 수행한다.
-      await createMyTour({ tourId: item.id, visitDate: date || null });
+      await createMyTour({
+        tourId: item.id,
+        visitDate: date || null,
+        useRecommendedItems,
+      });
       queryClient.invalidateQueries({ queryKey: getGetMyTourListQueryKey() });
       router.push("/trips");
       return true;

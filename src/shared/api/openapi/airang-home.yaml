@@ -622,6 +622,10 @@ components:
           format: date
           nullable: true
           example: "2026-09-12"
+        useRecommendedItems:
+          type: boolean
+          description: "추천 준비물을 체크리스트에 자동 추가할지 여부"
+          example: false
 
     CreateMyTourResponse:
       type: object

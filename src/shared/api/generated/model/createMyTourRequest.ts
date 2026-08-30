@@ -10,4 +10,6 @@ export interface CreateMyTourRequest {
   tourId: string;
   /** @nullable */
   visitDate?: string | null;
+  /** 추천 준비물을 체크리스트에 자동 추가할지 여부 */
+  useRecommendedItems?: boolean;
 }
