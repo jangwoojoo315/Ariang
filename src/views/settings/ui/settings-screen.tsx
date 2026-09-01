@@ -43,6 +43,8 @@ function SettingsSection({ title, children, px }: { title:string; children:React
 
 function EditChildModal({ child, onSave, onClose, title = '아이 정보 편집' }: { child: ChildInput; onSave:(c:ChildInput)=>void; onClose:()=>void; title?: string }) {
   const [form, setForm] = useState(child);
+  // 오늘 이후(미래) 생년월일은 선택할 수 없도록 max로 제한
+  const today = new Date().toISOString().slice(0, 10);
   return (
     <>
       <div style={{ fontWeight:800, fontSize:18, marginBottom:18 }}>{title}</div>
@@ -52,7 +54,7 @@ function EditChildModal({ child, onSave, onClose, title = '아이 정보 편집'
       </div>
       <div style={{ marginBottom:20 }}>
         <div style={{ fontSize:12, color:'var(--text2)', fontWeight:600, marginBottom:6 }}>생년월일</div>
-        <input type="date" value={form.birth} onChange={e => setForm(f=>({...f,birth:e.target.value}))} style={{ width:'100%', border:'1.5px solid var(--border)', borderRadius:10, padding:'10px 12px', fontSize:14 }} />
+        <input type="date" max={today} value={form.birth} onChange={e => setForm(f=>({...f,birth:e.target.value}))} style={{ width:'100%', border:'1.5px solid var(--border)', borderRadius:10, padding:'10px 12px', fontSize:14 }} />
       </div>
       <div style={{ display:'flex', gap:10 }}>
         <button onClick={onClose} style={{ flex:1, padding:'12px 0', borderRadius:12, border:'1.5px solid var(--border)', fontSize:14, fontWeight:600, color:'var(--text2)', cursor:'pointer' }}>취소</button>
