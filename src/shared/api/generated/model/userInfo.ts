@@ -10,6 +10,8 @@ export interface UserInfo {
   /** 사용자 이름 */
   name: string;
   children: Child[];
+  /** 톡캘린더 등록 */
+  calendarSyncEnabled: boolean;
   /** D-1 알림 */
   dayBeforeTodoEnabled: boolean;
   /** 당일 알림 */

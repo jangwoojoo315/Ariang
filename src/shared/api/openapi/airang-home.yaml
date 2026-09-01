@@ -737,6 +737,7 @@ components:
       required:
         - name
         - children
+        - calendarSyncEnabled
         - dayBeforeTodoEnabled
         - dayAlarmEnabled
       properties:
@@ -748,6 +749,10 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Child'
+        calendarSyncEnabled:
+          type: boolean
+          description: "톡캘린더 등록"
+          example: true
         dayBeforeTodoEnabled:
           type: boolean
           description: "D-1 알림"
@@ -771,6 +776,8 @@ components:
       type: object
       description: "부분 수정 — 보낸 필드만 반영"
       properties:
+        calendarSyncEnabled:
+          type: boolean
         dayBeforeTodoEnabled:
           type: boolean
         dayAlarmEnabled:

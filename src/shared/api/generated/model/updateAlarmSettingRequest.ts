@@ -9,6 +9,7 @@
  * 부분 수정 — 보낸 필드만 반영
  */
 export interface UpdateAlarmSettingRequest {
+  calendarSyncEnabled?: boolean;
   dayBeforeTodoEnabled?: boolean;
   dayAlarmEnabled?: boolean;
 }

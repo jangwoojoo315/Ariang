@@ -11,9 +11,9 @@ import {
 } from '@/shared/api/generated/user/user';
 import type { Child, ChildInput, UserInfo } from '@/shared/api/generated/model';
 
-function Toggle({ active, onChange }: { active: boolean; onChange: () => void }) {
+function Toggle({ active, onChange, disabled = false }: { active: boolean; onChange: () => void; disabled?: boolean }) {
   return (
-    <button onClick={onChange} style={{ width:46, height:26, borderRadius:13, background: active ? 'var(--primary)' : '#D0D0D0', position:'relative', transition:'background 0.2s', flexShrink:0, border:'none', cursor:'pointer' }}>
+    <button onClick={disabled ? undefined : onChange} disabled={disabled} style={{ width:46, height:26, borderRadius:13, background: active ? 'var(--primary)' : '#D0D0D0', position:'relative', transition:'background 0.2s', flexShrink:0, border:'none', cursor: disabled ? 'not-allowed' : 'pointer', opacity: disabled ? 0.45 : 1 }}>
       <div style={{ position:'absolute', top:3, left: active ? 23 : 3, width:20, height:20, borderRadius:10, background:'#fff', boxShadow:'0 1px 3px rgba(0,0,0,0.2)', transition:'left 0.2s' }} />
     </button>
   );
@@ -81,11 +81,17 @@ export function SettingsScreen() {
   const [confirmLogout, setConfirmLogout] = useState(false);
   const [now] = useState(() => Date.now());
   // 토글 즉시 반응용 로컬 상태 (서버 값이 바뀌면 렌더 중 동기화)
-  const [alarm, setAlarm] = useState({ dayBeforeTodoEnabled: false, dayAlarmEnabled: false });
+  // calendarSyncEnabled(톡캘린더 등록)가 꺼지면 D-1·당일 알림도 비활성화된다.
+  const [alarm, setAlarm] = useState({
+    calendarSyncEnabled: false,
+    dayBeforeTodoEnabled: false,
+    dayAlarmEnabled: false,
+  });
   const [syncedFrom, setSyncedFrom] = useState<UserInfo | undefined>(undefined);
   if (userInfo && userInfo !== syncedFrom) {
     setSyncedFrom(userInfo);
     setAlarm({
+      calendarSyncEnabled: userInfo.calendarSyncEnabled,
       dayBeforeTodoEnabled: userInfo.dayBeforeTodoEnabled,
       dayAlarmEnabled: userInfo.dayAlarmEnabled,
     });
@@ -118,6 +124,26 @@ export function SettingsScreen() {
       await updateAlarmSetting({ [field]: value });
     } catch {
       setAlarm((a) => ({ ...a, [field]: !value })); // 롤백
+    }
+  };
+
+  // 톡캘린더 등록(calendarSyncEnabled) 토글: 끄면 D-1·당일 알림도 함께 꺼서
+  // 한 번의 요청으로 서버와 동기화한다. (알림은 캘린더 일정에 붙는 것이라
+  // 캘린더 없이는 의미가 없으므로)
+  const toggleCalendar = async (value: boolean) => {
+    const prev = alarm;
+    const next = value
+      ? { ...alarm, calendarSyncEnabled: true }
+      : { calendarSyncEnabled: false, dayBeforeTodoEnabled: false, dayAlarmEnabled: false };
+    setAlarm(next);
+    try {
+      await updateAlarmSetting(
+        value
+          ? { calendarSyncEnabled: true }
+          : { calendarSyncEnabled: false, dayBeforeTodoEnabled: false, dayAlarmEnabled: false },
+      );
+    } catch {
+      setAlarm(prev); // 롤백
     }
   };
 
@@ -172,13 +198,17 @@ export function SettingsScreen() {
       </SettingsSection>
 
       <SettingsSection title="🔔 알림 설정" px={px}>
+        <SettingsRow
+          left={<div><div style={{ fontWeight:600, fontSize:15 }}>톡캘린더 등록</div><div style={{ fontSize:12, color:'var(--text2)', marginTop:2 }}>여행 일정을 카카오 톡캘린더에 자동 등록</div></div>}
+          right={<Toggle active={alarm.calendarSyncEnabled} onChange={() => toggleCalendar(!alarm.calendarSyncEnabled)} />}
+        />
         {[
           { key:'dayBeforeTodoEnabled' as const, title:'D-1 알림', desc:'여행 전날 저녁 8시에 준비물 알림 발송' },
           { key:'dayAlarmEnabled' as const,      title:'당일 알림', desc:'여행 당일 아침 7시에 체크리스트 요약 발송' },
         ].map(({ key, title, desc }) => (
           <SettingsRow key={key}
-            left={<><div><div style={{ fontWeight:600, fontSize:15 }}>{title}</div><div style={{ fontSize:12, color:'var(--text2)', marginTop:2 }}>{desc}</div></div></>}
-            right={<Toggle active={alarm[key]} onChange={() => toggleAlarm(key, !alarm[key])} />}
+            left={<><div style={{ opacity: alarm.calendarSyncEnabled ? 1 : 0.45 }}><div style={{ fontWeight:600, fontSize:15 }}>{title}</div><div style={{ fontSize:12, color:'var(--text2)', marginTop:2 }}>{alarm.calendarSyncEnabled ? desc : '톡캘린더 등록을 켜면 사용할 수 있어요'}</div></div></>}
+            right={<Toggle active={alarm.calendarSyncEnabled && alarm[key]} disabled={!alarm.calendarSyncEnabled} onChange={() => toggleAlarm(key, !alarm[key])} />}
           />
         ))}
       </SettingsSection>
