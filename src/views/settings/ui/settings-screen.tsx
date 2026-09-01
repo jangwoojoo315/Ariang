@@ -275,8 +275,8 @@ export function SettingsScreen() {
         {([
           { label:'버전', value:'1.0.0 (beta)' },
           { label:'오픈소스 라이선스', value:'›', onClick:() => router.push('/legal/licenses') },
-          { label:'개인정보 처리방침', value:'›' },
-          { label:'이용약관', value:'›' },
+          { label:'개인정보 처리방침', value:'›', onClick:() => router.push('/legal/privacy') },
+          { label:'이용약관', value:'›', onClick:() => router.push('/legal/terms') },
         ] as { label:string; value:string; onClick?:() => void }[]).map(({ label, value, onClick }) => (
           <SettingsRow key={label}
             onClick={onClick}
