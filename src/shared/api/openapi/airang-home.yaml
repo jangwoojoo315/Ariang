@@ -739,7 +739,9 @@ components:
         - children
         - calendarSyncEnabled
         - dayBeforeTodoEnabled
+        - dayBeforeReminderHour
         - dayAlarmEnabled
+        - dayAlarmReminderHour
       properties:
         name:
           type: string
@@ -757,10 +759,22 @@ components:
           type: boolean
           description: "D-1 알림"
           example: true
+        dayBeforeReminderHour:
+          type: integer
+          description: "D-1 알림 발송 시각(정각, 0~23시)"
+          minimum: 0
+          maximum: 23
+          example: 20
         dayAlarmEnabled:
           type: boolean
           description: "당일 알림"
           example: true
+        dayAlarmReminderHour:
+          type: integer
+          description: "당일 알림 발송 시각(정각, 0~23시)"
+          minimum: 0
+          maximum: 23
+          example: 7
 
     UpdateChildrenRequest:
       type: object
@@ -780,8 +794,18 @@ components:
           type: boolean
         dayBeforeTodoEnabled:
           type: boolean
+        dayBeforeReminderHour:
+          type: integer
+          description: "D-1 알림 발송 시각(정각, 0~23시)"
+          minimum: 0
+          maximum: 23
         dayAlarmEnabled:
           type: boolean
+        dayAlarmReminderHour:
+          type: integer
+          description: "당일 알림 발송 시각(정각, 0~23시)"
+          minimum: 0
+          maximum: 23
 
 tags:
   - name: Home

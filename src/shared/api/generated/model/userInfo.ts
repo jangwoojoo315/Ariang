@@ -14,6 +14,18 @@ export interface UserInfo {
   calendarSyncEnabled: boolean;
   /** D-1 알림 */
   dayBeforeTodoEnabled: boolean;
+  /**
+     * D-1 알림 발송 시각(정각, 0~23시)
+     * @minimum 0
+     * @maximum 23
+     */
+  dayBeforeReminderHour: number;
   /** 당일 알림 */
   dayAlarmEnabled: boolean;
+  /**
+     * 당일 알림 발송 시각(정각, 0~23시)
+     * @minimum 0
+     * @maximum 23
+     */
+  dayAlarmReminderHour: number;
 }

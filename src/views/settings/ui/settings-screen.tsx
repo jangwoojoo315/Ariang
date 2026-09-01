@@ -19,6 +19,29 @@ function Toggle({ active, onChange, disabled = false }: { active: boolean; onCha
   );
 }
 
+// 정각 시간을 "오전/오후 h시"로 표기
+function formatHour(h: number): string {
+  const period = h < 12 ? '오전' : '오후';
+  const h12 = h % 12 === 0 ? 12 : h % 12;
+  return `${period} ${h12}시`;
+}
+
+// 정각 단위(0~23시)만 선택하는 시간 드롭다운. 분 단위는 받지 않는다.
+function HourSelect({ value, onChange, disabled = false }: { value: number; onChange: (h: number) => void; disabled?: boolean }) {
+  return (
+    <select
+      value={value}
+      disabled={disabled}
+      onChange={(e) => onChange(Number(e.target.value))}
+      style={{ border:'1.5px solid var(--border)', borderRadius:10, padding:'6px 10px', fontSize:14, background:'var(--surface)', color:'var(--text)', cursor: disabled ? 'not-allowed' : 'pointer', opacity: disabled ? 0.45 : 1 }}
+    >
+      {Array.from({ length: 24 }, (_, h) => (
+        <option key={h} value={h}>{formatHour(h)}</option>
+      ))}
+    </select>
+  );
+}
+
 function SettingsCard({ children }: { children: React.ReactNode }) {
   return <div style={{ background:'var(--surface)', borderRadius:16, padding:'4px 16px', boxShadow:'0 1px 6px rgba(0,0,0,0.06)' }}>{children}</div>;
 }
@@ -87,7 +110,9 @@ export function SettingsScreen() {
   const [alarm, setAlarm] = useState({
     calendarSyncEnabled: false,
     dayBeforeTodoEnabled: false,
+    dayBeforeReminderHour: 20,
     dayAlarmEnabled: false,
+    dayAlarmReminderHour: 7,
   });
   const [syncedFrom, setSyncedFrom] = useState<UserInfo | undefined>(undefined);
   if (userInfo && userInfo !== syncedFrom) {
@@ -95,7 +120,9 @@ export function SettingsScreen() {
     setAlarm({
       calendarSyncEnabled: userInfo.calendarSyncEnabled,
       dayBeforeTodoEnabled: userInfo.dayBeforeTodoEnabled,
+      dayBeforeReminderHour: userInfo.dayBeforeReminderHour,
       dayAlarmEnabled: userInfo.dayAlarmEnabled,
+      dayAlarmReminderHour: userInfo.dayAlarmReminderHour,
     });
   }
   const width = useWindowWidth();
@@ -129,6 +156,20 @@ export function SettingsScreen() {
     }
   };
 
+  // 알림 발송 시각(정각) 변경: 로컬 즉시 반영 후 서버 전송, 실패 시 롤백.
+  const setAlarmHour = async (
+    field: 'dayBeforeReminderHour' | 'dayAlarmReminderHour',
+    value: number,
+  ) => {
+    const prev = alarm[field];
+    setAlarm((a) => ({ ...a, [field]: value }));
+    try {
+      await updateAlarmSetting({ [field]: value });
+    } catch {
+      setAlarm((a) => ({ ...a, [field]: prev })); // 롤백
+    }
+  };
+
   // 톡캘린더 등록(calendarSyncEnabled) 토글: 끄면 D-1·당일 알림도 함께 꺼서
   // 한 번의 요청으로 서버와 동기화한다. (알림은 캘린더 일정에 붙는 것이라
   // 캘린더 없이는 의미가 없으므로)
@@ -136,7 +177,7 @@ export function SettingsScreen() {
     const prev = alarm;
     const next = value
       ? { ...alarm, calendarSyncEnabled: true }
-      : { calendarSyncEnabled: false, dayBeforeTodoEnabled: false, dayAlarmEnabled: false };
+      : { ...alarm, calendarSyncEnabled: false, dayBeforeTodoEnabled: false, dayAlarmEnabled: false };
     setAlarm(next);
     try {
       await updateAlarmSetting(
@@ -204,15 +245,26 @@ export function SettingsScreen() {
           left={<div><div style={{ fontWeight:600, fontSize:15 }}>톡캘린더 등록</div><div style={{ fontSize:12, color:'var(--text2)', marginTop:2 }}>여행 일정을 카카오 톡캘린더에 자동 등록</div></div>}
           right={<Toggle active={alarm.calendarSyncEnabled} onChange={() => toggleCalendar(!alarm.calendarSyncEnabled)} />}
         />
-        {[
-          { key:'dayBeforeTodoEnabled' as const, title:'D-1 알림', desc:'여행 전날 저녁 8시에 준비물 알림 발송' },
-          { key:'dayAlarmEnabled' as const,      title:'당일 알림', desc:'여행 당일 아침 7시에 체크리스트 요약 발송' },
-        ].map(({ key, title, desc }) => (
-          <SettingsRow key={key}
-            left={<><div style={{ opacity: alarm.calendarSyncEnabled ? 1 : 0.45 }}><div style={{ fontWeight:600, fontSize:15 }}>{title}</div><div style={{ fontSize:12, color:'var(--text2)', marginTop:2 }}>{alarm.calendarSyncEnabled ? desc : '톡캘린더 등록을 켜면 사용할 수 있어요'}</div></div></>}
-            right={<Toggle active={alarm.calendarSyncEnabled && alarm[key]} disabled={!alarm.calendarSyncEnabled} onChange={() => toggleAlarm(key, !alarm[key])} />}
-          />
-        ))}
+        {([
+          { key:'dayBeforeTodoEnabled', hourKey:'dayBeforeReminderHour', title:'D-1 알림' },
+          { key:'dayAlarmEnabled',       hourKey:'dayAlarmReminderHour', title:'당일 알림' },
+        ] as const).map(({ key, hourKey, title }) => {
+          const on = alarm.calendarSyncEnabled && alarm[key];
+          return (
+            <SettingsRow key={key}
+              left={<><div style={{ opacity: alarm.calendarSyncEnabled ? 1 : 0.45 }}><div style={{ fontWeight:600, fontSize:15 }}>{title}</div>{!alarm.calendarSyncEnabled && <div style={{ fontSize:12, color:'var(--text2)', marginTop:2 }}>톡캘린더 등록을 켜면 사용할 수 있어요</div>}</div></>}
+              right={<div style={{ display:'flex', alignItems:'center', gap:12 }}>
+                {on && (
+                  <div style={{ display:'flex', alignItems:'center', gap:6 }}>
+                    <span style={{ fontSize:12, color:'var(--text2)', whiteSpace:'nowrap' }}>🕐 발송 시각</span>
+                    <HourSelect value={alarm[hourKey]} onChange={(h) => setAlarmHour(hourKey, h)} />
+                  </div>
+                )}
+                <Toggle active={on} disabled={!alarm.calendarSyncEnabled} onChange={() => toggleAlarm(key, !alarm[key])} />
+              </div>}
+            />
+          );
+        })}
       </SettingsSection>
       </>
       )}
