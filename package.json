@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "api:generate": "orval --config ./orval.config.ts"
+    "api:generate": "orval --config ./orval.config.ts",
+    "licenses:generate": "node scripts/generate-licenses.mjs"
   },
   "dependencies": {
     "@tanstack/react-query": "^5.101.0",
@@ -26,6 +27,7 @@
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "16.2.7",
+    "license-checker": "^25.0.1",
     "orval": "^8.20.0",
     "tailwindcss": "^4",
     "typescript": "^5"

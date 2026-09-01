@@ -1,5 +1,6 @@
 'use client';
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { useQueryClient } from '@tanstack/react-query';
 import { Modal, PrimaryBtn } from '@/shared/ui';
 import { useWindowWidth, clearTokens } from '@/shared/lib';
@@ -46,9 +47,9 @@ function SettingsCard({ children }: { children: React.ReactNode }) {
   return <div style={{ background:'var(--surface)', borderRadius:16, padding:'4px 16px', boxShadow:'0 1px 6px rgba(0,0,0,0.06)' }}>{children}</div>;
 }
 
-function SettingsRow({ left, right }: { left: React.ReactNode; right: React.ReactNode }) {
+function SettingsRow({ left, right, onClick }: { left: React.ReactNode; right: React.ReactNode; onClick?: () => void }) {
   return (
-    <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', gap:12, padding:'12px 0', borderBottom:'1px solid var(--border)' }}>
+    <div onClick={onClick} style={{ display:'flex', alignItems:'center', justifyContent:'space-between', gap:12, padding:'12px 0', borderBottom:'1px solid var(--border)', cursor: onClick ? 'pointer' : 'default' }}>
       <div style={{ display:'flex', alignItems:'center', gap:12, flex:1, minWidth:0 }}>{left}</div>
       <div style={{ flexShrink:0 }}>{right}</div>
     </div>
@@ -99,6 +100,7 @@ function getAge(birth: string, now: number): string | null {
 
 export function SettingsScreen() {
   const qc = useQueryClient();
+  const router = useRouter();
   const { data: userInfo, isLoading, isError } = useGetUserInfo();
   const [editingChild, setEditingChild] = useState<number|null>(null);
   const [addingChild, setAddingChild] = useState(false);
@@ -270,13 +272,14 @@ export function SettingsScreen() {
       )}
 
       <SettingsSection title="앱 정보" px={px}>
-        {[
+        {([
           { label:'버전', value:'1.0.0 (beta)' },
-          { label:'오픈소스 라이선스', value:'›' },
+          { label:'오픈소스 라이선스', value:'›', onClick:() => router.push('/legal/licenses') },
           { label:'개인정보 처리방침', value:'›' },
           { label:'이용약관', value:'›' },
-        ].map(({ label, value }) => (
+        ] as { label:string; value:string; onClick?:() => void }[]).map(({ label, value, onClick }) => (
           <SettingsRow key={label}
+            onClick={onClick}
             left={<span style={{ fontSize:15 }}>{label}</span>}
             right={<span style={{ fontSize:14, color:'var(--text2)' }}>{value}</span>}
           />
