@@ -11,7 +11,6 @@ import {
   createMyTour,
   getGetMyTourListQueryKey,
 } from "@/shared/api/generated/my-tour/my-tour";
-import { useGetUserInfo } from "@/shared/api/generated/user/user";
 import type { SpotOrFestival, Bundle } from "@/shared/types";
 import { TabsProvider } from "./tabs-context";
 
@@ -42,8 +41,6 @@ export default function TabsLayout({ children }: { children: React.ReactNode }) 
   const queryClient = useQueryClient();
   const { data: myTours } = useGetMyTourList({ query: { enabled: isLoggedIn } });
   const savedTrips = (myTours ?? []).map((t) => ({ itemId: t.tourInfo.id }));
-  // 상단바 자녀 칩 표시용 사용자 정보.
-  const { data: userInfo } = useGetUserInfo({ query: { enabled: isLoggedIn } });
 
   // 로그인 안내 후 로그인 페이지(게이트)로 이동
   const goLogin = () => {
@@ -182,23 +179,6 @@ export default function TabsLayout({ children }: { children: React.ReactNode }) 
                 <span style={{ fontSize: 22 }}>🌿</span>
                 <span style={{ fontWeight: 800, fontSize: 20, color: "var(--logo)" }}>아이랑</span>
               </div>
-              {userInfo?.children?.[0] && (
-                <div
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 6,
-                    background: "var(--tag-bg)",
-                    padding: "5px 10px",
-                    borderRadius: 20,
-                  }}
-                >
-                  <span style={{ fontSize: 14 }}>🧒</span>
-                  <span style={{ fontSize: 12, fontWeight: 700, color: "var(--primary)" }}>
-                    {userInfo.children[0].name || "아이"}
-                  </span>
-                </div>
-              )}
             </div>
           )}
 
