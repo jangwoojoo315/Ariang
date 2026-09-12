@@ -12,6 +12,7 @@ import {
   useGetNatureTourTop5,
   useGetRecentlyOpened,
 } from "@/shared/api/generated/home/home";
+import { DartFab } from "@/features/random-course-dart";
 import { TourSection } from "./tour-section";
 
 interface Props {
@@ -55,71 +56,76 @@ export function HomeScreen({ onSelectItem }: Props) {
   ].filter(Boolean) as BannerSlide[];
 
   return (
-    <div
-      style={{
-        height: "100%",
-        overflowY: "auto",
-        paddingBottom: isMobile ? 80 : 40,
-      }}
-      className="no-scroll"
-    >
-      {/* Hero Banner (역사·체험·자연 Top1 자동 순환) */}
-      <HeroBanner
-        key={bannerSlides.length}
-        slides={bannerSlides}
-        onSelectItem={onSelectItem}
-        isMobile={isMobile}
-        isWide={isWide}
-        px={px}
-      />
+    <div style={{ position: "relative", height: "100%" }}>
+      <div
+        style={{
+          height: "100%",
+          overflowY: "auto",
+          paddingBottom: isMobile ? 80 : 40,
+        }}
+        className="no-scroll"
+      >
+        {/* Hero Banner (역사·체험·자연 Top1 자동 순환) */}
+        <HeroBanner
+          key={bannerSlides.length}
+          slides={bannerSlides}
+          onSelectItem={onSelectItem}
+          isMobile={isMobile}
+          isWide={isWide}
+          px={px}
+        />
 
-      <div style={{ padding: `28px ${px}px 0` }}>
-        <TourSection
-          title="🏛️ 지금 인기 역사관광지 Top 5"
-          items={historyTour.data}
-          isLoading={historyTour.isLoading}
-          isError={historyTour.isError}
-          isMobile={isMobile}
-          cardCols={cardCols}
-          px={px}
-          theme="geology"
-          onSelectItem={onSelectItem}
-        />
-        <TourSection
-          title="🎨 지금 인기 체험관광지 Top 5"
-          items={experienceTour.data}
-          isLoading={experienceTour.isLoading}
-          isError={experienceTour.isError}
-          isMobile={isMobile}
-          cardCols={cardCols}
-          px={px}
-          theme="farm"
-          onSelectItem={onSelectItem}
-        />
-        <TourSection
-          title="🌲 지금 인기 자연관광지 Top 5"
-          items={natureTour.data}
-          isLoading={natureTour.isLoading}
-          isError={natureTour.isError}
-          isMobile={isMobile}
-          cardCols={cardCols}
-          px={px}
-          theme="forest"
-          onSelectItem={onSelectItem}
-        />
-        <TourSection
-          title="🌱 새로 생긴 곳"
-          items={recentlyOpened.data}
-          isLoading={recentlyOpened.isLoading}
-          isError={recentlyOpened.isError}
-          isMobile={isMobile}
-          cardCols={cardCols}
-          px={px}
-          theme="wetland"
-          showRank={false}
-          onSelectItem={onSelectItem}
-        />
+        <div style={{ padding: `28px ${px}px 0` }}>
+          <TourSection
+            title="🏛️ 지금 인기 역사관광지 Top 5"
+            items={historyTour.data}
+            isLoading={historyTour.isLoading}
+            isError={historyTour.isError}
+            isMobile={isMobile}
+            cardCols={cardCols}
+            px={px}
+            theme="geology"
+            onSelectItem={onSelectItem}
+          />
+          <TourSection
+            title="🎨 지금 인기 체험관광지 Top 5"
+            items={experienceTour.data}
+            isLoading={experienceTour.isLoading}
+            isError={experienceTour.isError}
+            isMobile={isMobile}
+            cardCols={cardCols}
+            px={px}
+            theme="farm"
+            onSelectItem={onSelectItem}
+          />
+          <TourSection
+            title="🌲 지금 인기 자연관광지 Top 5"
+            items={natureTour.data}
+            isLoading={natureTour.isLoading}
+            isError={natureTour.isError}
+            isMobile={isMobile}
+            cardCols={cardCols}
+            px={px}
+            theme="forest"
+            onSelectItem={onSelectItem}
+          />
+          <TourSection
+            title="🌱 새로 생긴 곳"
+            items={recentlyOpened.data}
+            isLoading={recentlyOpened.isLoading}
+            isError={recentlyOpened.isError}
+            isMobile={isMobile}
+            cardCols={cardCols}
+            px={px}
+            theme="wetland"
+            showRank={false}
+            onSelectItem={onSelectItem}
+          />
+        </div>
       </div>
+
+      {/* 랜덤 코스 다트 — 화면 우측 하단 FAB */}
+      <DartFab />
     </div>
   );
 }
