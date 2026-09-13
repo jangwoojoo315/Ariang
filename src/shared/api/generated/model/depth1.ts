@@ -12,4 +12,5 @@ export const Depth1 = {
   HS: 'HS',
   NA: 'NA',
   EX: 'EX',
+  VE: 'VE',
 } as const;

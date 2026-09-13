@@ -536,6 +536,7 @@ const SPOT_TYPE_GROUPS = [
   { key: "HS", label: "역사" },
   { key: "NA", label: "자연" },
   { key: "EX", label: "체험" },
+  { key: "VE", label: "문화" },
 ];
 
 // 하위 항목 키는 API Depth2 코드와 동일하게 맞춘다.
@@ -556,6 +557,16 @@ const SPOT_TYPES = {
   EX05: { label: "웰니스관광", group: "EX" },
   EX06: { label: "산업관광", group: "EX" },
   EX07: { label: "기타체험", group: "EX" },
+  VE01: { label: "랜드마크관광", group: "VE" },
+  VE02: { label: "테마공원", group: "VE" },
+  VE03: { label: "도시공원", group: "VE" },
+  VE04: { label: "도시.지역문화관광", group: "VE" },
+  VE05: { label: "복합관광시설", group: "VE" },
+  VE06: { label: "공연시설", group: "VE" },
+  VE07: { label: "전시시설", group: "VE" },
+  VE08: { label: "행사시설", group: "VE" },
+  VE09: { label: "교육시설", group: "VE" },
+  VE10: { label: "레저스포츠시설", group: "VE" },
 };
 
 function FilterSheet({
