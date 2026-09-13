@@ -6,6 +6,9 @@ export const apiInstance = axios.create({
   headers: {
     'Content-Type': 'application/json',
   },
+  // 배열 파라미터를 depth1=HS&depth1=VE 형태로 보낸다.
+  // axios 기본 직렬화는 depth1[]=HS 처럼 대괄호를 붙여 서버가 읽지 못한다.
+  paramsSerializer: { indexes: null },
 });
 
 // 요청 인터셉터: 액세스 토큰 주입
