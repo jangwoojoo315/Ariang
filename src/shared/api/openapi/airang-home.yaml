@@ -92,6 +92,20 @@ paths:
                 items:
                   $ref: '#/components/schemas/RecentPlace'
 
+  /api/recommend:
+    get:
+      summary: 랜덤 추천 코스 (다트)
+      operationId: getRecommendCourse
+      tags:
+        - Home
+      responses:
+        '200':
+          description: 성공
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RecommendCourse'
+
   /api/search:
     get:
       summary: 관광지 검색
@@ -413,6 +427,78 @@ components:
         - GYEONGBUK
         - GYEONGNAM
         - JEJU
+
+    CourseSpot:
+      type: object
+      required:
+        - subContentId
+        - name
+        - overview
+        - imgUrl
+        - imgAlt
+      properties:
+        subContentId:
+          type: string
+          example: "128803"
+        name:
+          type: string
+          example: "속초 등대전망대"
+        overview:
+          type: string
+          nullable: true
+          example: "속초시 영랑동에 위치한 속초등대는 영금정 속초 등대전망대라고 많이 알려져 있다."
+        imgUrl:
+          type: string
+          nullable: true
+          example: "https://tong.visitkorea.or.kr/cms/resource/54/677054_image2_1.jpg"
+        imgAlt:
+          type: string
+          nullable: true
+          example: "속초등대전망대 일출_64"
+
+    RecommendCourse:
+      type: object
+      required:
+        - contentId
+        - title
+        - addr1
+        - imgUrl
+        - overview
+        - distance
+        - takeTime
+        - theme
+        - spots
+      properties:
+        contentId:
+          type: string
+          example: "2361026"
+        title:
+          type: string
+          example: "가도 가도 또 가고 싶은 여행지의 스테디셀러"
+        addr1:
+          type: string
+          example: "강원특별자치도 속초시 영금정로 24"
+        imgUrl:
+          type: string
+          nullable: true
+          example: "https://tong.visitkorea.or.kr/cms/resource/54/677054_image2_1.jpg"
+        overview:
+          type: string
+          nullable: true
+          example: "가족 단위 여행객을 위한 코스"
+        distance:
+          type: string
+          example: "17.58km"
+        takeTime:
+          type: string
+          example: "1일"
+        theme:
+          type: string
+          example: "가족코스"
+        spots:
+          type: array
+          items:
+            $ref: '#/components/schemas/CourseSpot'
 
     TourSpot:
       type: object

@@ -1,2 +1,2 @@
 export { DartFab, DartThrowModal, DartIcon } from "./ui/dart";
-export { DART_COURSES, type DartCourse } from "./model/courses";
+export { REGION_POINTS, resolveRegionPoint, type RegionPoint } from "./model/region-points";

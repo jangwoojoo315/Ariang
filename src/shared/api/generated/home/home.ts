@@ -21,6 +21,7 @@ import type {
 
 import type {
   RecentPlace,
+  RecommendCourse,
   TourSpot
 } from '../model';
 
@@ -493,6 +494,98 @@ export function useGetRecentlyOpened<TData = Awaited<ReturnType<typeof getRecent
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getGetRecentlyOpenedQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+/**
+ * @summary 랜덤 추천 코스 (다트)
+ */
+export const getRecommendCourse = (
+
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<RecommendCourse>(
+      {url: `/api/recommend`, method: 'GET', signal
+    },
+      );
+    }
+
+
+
+
+export const getGetRecommendCourseQueryKey = () => {
+    return [
+    `/api/recommend`
+    ] as const;
+    }
+
+
+export const getGetRecommendCourseQueryOptions = <TData = Awaited<ReturnType<typeof getRecommendCourse>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getRecommendCourse>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetRecommendCourseQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getRecommendCourse>>> = ({ signal }) => getRecommendCourse(signal);
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getRecommendCourse>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetRecommendCourseQueryResult = NonNullable<Awaited<ReturnType<typeof getRecommendCourse>>>
+export type GetRecommendCourseQueryError = unknown
+
+
+export function useGetRecommendCourse<TData = Awaited<ReturnType<typeof getRecommendCourse>>, TError = unknown>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getRecommendCourse>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getRecommendCourse>>,
+          TError,
+          Awaited<ReturnType<typeof getRecommendCourse>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetRecommendCourse<TData = Awaited<ReturnType<typeof getRecommendCourse>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getRecommendCourse>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getRecommendCourse>>,
+          TError,
+          Awaited<ReturnType<typeof getRecommendCourse>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetRecommendCourse<TData = Awaited<ReturnType<typeof getRecommendCourse>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getRecommendCourse>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary 랜덤 추천 코스 (다트)
+ */
+
+export function useGetRecommendCourse<TData = Awaited<ReturnType<typeof getRecommendCourse>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getRecommendCourse>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetRecommendCourseQueryOptions(options)
 
   const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 

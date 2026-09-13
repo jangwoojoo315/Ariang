@@ -1,6 +1,9 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
-import { DART_COURSES, type DartCourse } from "../model/courses";
+import Image from "next/image";
+import { getRecommendCourse } from "@/shared/api/generated/home/home";
+import type { RecommendCourse } from "@/shared/api/generated/model";
+import { resolveRegionPoint } from "../model/region-points";
 
 /** 지도 실루엣(장식용 도형) — viewBox 300×400 기준 */
 const KOREA_D =
@@ -55,19 +58,29 @@ const DART_CSS = `
 @keyframes dtStamp{0%{opacity:0;transform:translate(-50%,-50%) rotate(-9deg) scale(1.8)}100%{opacity:1;transform:translate(-50%,-50%) rotate(-9deg) scale(1)}}
 .dt-right{padding:34px 30px 30px;display:flex;flex-direction:column;gap:16px;border-top:1px solid var(--border)}
 @media(min-width:820px){.dt-right{border-top:0;border-left:1px solid var(--border)}}
-.dt-resting{flex:1;min-height:140px;display:flex;align-items:center;justify-content:center;text-align:center;border:1.5px dashed var(--border);border-radius:18px;padding:28px 20px;font-size:14px;color:var(--text3);line-height:1.7;transition:opacity .3s}
-.dt-resting.gone{display:none}
+.dt-resting{flex:1;min-height:140px;display:flex;align-items:center;justify-content:center;text-align:center;border:1.5px dashed var(--border);border-radius:18px;padding:28px 20px;font-size:14px;color:var(--text3);line-height:1.7}
+.dt-err{border:1.5px solid var(--accent);background:var(--accent-light);color:var(--primary-dark);border-radius:18px;padding:18px 20px;font-size:13px;line-height:1.7;text-align:center}
 .dt-card{background:var(--surface);border-radius:18px;padding:24px;box-shadow:0 8px 26px rgba(24,38,30,.08);opacity:0;transform:translateY(14px);transition:opacity .35s,transform .45s cubic-bezier(.22,1.2,.36,1)}
 .dt-card.hidden{display:none}
 .dt-card.up{opacity:1;transform:none}
+.dt-thumb{width:100%;height:140px;object-fit:cover;border-radius:12px;margin-bottom:16px;display:block;background:var(--tag-bg)}
 .dt-tag{display:inline-flex;background:var(--tag-bg);color:var(--primary-dark);font-size:11px;font-weight:700;padding:5px 11px;border-radius:20px;letter-spacing:.04em}
-.dt-name{font-size:22px;font-weight:800;color:var(--text);margin-top:12px;letter-spacing:-.4px}
+.dt-name{font-size:22px;font-weight:800;color:var(--text);margin-top:12px;letter-spacing:-.4px;line-height:1.35}
+.dt-addr{font-size:12.5px;color:var(--text3);margin-top:8px;line-height:1.55}
 .dt-desc{font-size:14px;color:var(--text2);line-height:1.7;margin-top:10px;text-wrap:pretty}
 .dt-meta{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
 .dt-meta span{background:var(--tag-bg);color:var(--primary-dark);font-size:12px;font-weight:700;padding:5px 10px;border-radius:8px}
+.dt-spots{margin-top:20px;border-top:1px solid var(--border);padding-top:16px}
+.dt-spots-h{font-size:12px;font-weight:800;color:var(--text3);letter-spacing:.04em;margin-bottom:10px}
+.dt-spot{display:flex;gap:10px;align-items:flex-start;padding:8px 0}
+.dt-spot + .dt-spot{border-top:1px solid var(--border)}
+.dt-spot-img{width:52px;height:52px;object-fit:cover;border-radius:10px;flex-shrink:0;background:var(--tag-bg)}
+.dt-spot-n{font-size:13.5px;font-weight:700;color:var(--text);line-height:1.4}
+.dt-spot-o{font-size:12px;color:var(--text2);line-height:1.55;margin-top:3px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .dt-btns{display:flex;gap:10px;position:sticky;bottom:0;background:linear-gradient(to bottom,transparent,var(--bg) 30%);padding-top:14px;margin-top:auto}
 .dt-btns button{border:0;font-family:inherit;font-size:15px;font-weight:700;padding:15px;border-radius:14px;cursor:pointer;transition:transform .12s,opacity .2s}
 .dt-btns button:active{transform:scale(.97)}
+.dt-btns button:disabled{opacity:.6;cursor:default;transform:none}
 .dt-throw{flex:1;background:var(--primary);color:#fff}
 .dt-again{flex:0 0 104px;background:var(--tag-bg);color:var(--primary-dark)}
 .dt-fab{position:absolute;right:24px;bottom:24px;z-index:40;width:60px;height:60px;border:0;border-radius:50%;background:var(--primary);color:#fff;box-shadow:0 8px 24px rgba(38,96,78,.34);cursor:pointer;display:grid;place-items:center;transition:transform .15s,box-shadow .15s}
@@ -107,13 +120,16 @@ export function DartThrowModal({ onClose }: { onClose: () => void }) {
   const mapWrapRef = useRef<HTMLDivElement>(null);
   const trailRef = useRef<SVGPathElement>(null);
 
-  // 던지는 중 중복 실행 방지 / 직전과 같은 코스가 연속으로 나오지 않게 기억
+  // 던지는 중 중복 실행 방지
   const busyRef = useRef(false);
-  const lastRef = useRef(-1);
   const timersRef = useRef<number[]>([]);
+  const aliveRef = useRef(true);
 
-  const [result, setResult] = useState<DartCourse | null>(null);
+  const [result, setResult] = useState<RecommendCourse | null>(null);
+  const [regionLabel, setRegionLabel] = useState("");
   const [thrown, setThrown] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -123,10 +139,13 @@ export function DartThrowModal({ onClose }: { onClose: () => void }) {
     return () => window.removeEventListener("keydown", onKey);
   }, [onClose]);
 
-  // 연출 도중 닫히면 남은 타이머가 언마운트된 컴포넌트를 건드리지 않도록 정리
+  // 연출·요청 도중 닫히면 남은 타이머가 언마운트된 컴포넌트를 건드리지 않도록 정리
   useEffect(() => {
     const timers = timersRef;
+    const alive = aliveRef;
+    alive.current = true;
     return () => {
+      alive.current = false;
       timers.current.forEach(clearTimeout);
       timers.current = [];
     };
@@ -162,8 +181,8 @@ export function DartThrowModal({ onClose }: { onClose: () => void }) {
     }
   };
 
-  const go = () => {
-    if (busyRef.current) return;
+  /** 코스를 받아온 뒤 지도에 다트를 꽂는 연출 */
+  const animateThrow = (course: RecommendCourse) => {
     const dart = dartRef.current;
     const card = cardRef.current;
     const mark = markRef.current;
@@ -171,23 +190,21 @@ export function DartThrowModal({ onClose }: { onClose: () => void }) {
     const stamp = stampRef.current;
     const wrap = mapWrapRef.current;
     const trail = trailRef.current;
-    if (!dart || !card || !mark || !paper || !stamp || !wrap || !trail) return;
+    if (!dart || !card || !mark || !paper || !stamp || !wrap || !trail) {
+      busyRef.current = false;
+      return;
+    }
 
-    busyRef.current = true;
     card.classList.remove("up");
     stamp.className = "dt-stamp";
     mark.setAttribute("class", "dt-mark");
 
-    let i: number;
-    do {
-      i = Math.floor(Math.random() * DART_COURSES.length);
-    } while (i === lastRef.current && DART_COURSES.length > 1);
-    lastRef.current = i;
-    const course = DART_COURSES[i];
+    // 주소 앞머리(시도)로 꽂을 자리를 정한다.
+    const point = resolveRegionPoint(course.addr1);
 
     // 지도 SVG 좌표(300 기준)를 실제 렌더 크기로 환산
     const w = wrap.offsetWidth;
-    const target = { left: (course.x / 300) * w, top: (course.y / 300) * w };
+    const target = { left: (point.x / 300) * w, top: (point.y / 300) * w };
     const sx = -6;
     const sy = wrap.offsetHeight - 70;
 
@@ -195,8 +212,8 @@ export function DartThrowModal({ onClose }: { onClose: () => void }) {
     dart.style.setProperty("--sy", `${sy}px`);
     dart.style.setProperty("--dx", `${target.left - 13}px`);
     dart.style.setProperty("--dy", `${target.top - 112}px`);
-    mark.setAttribute("cx", String(course.x));
-    mark.setAttribute("cy", String(course.y));
+    mark.setAttribute("cx", String(point.x));
+    mark.setAttribute("cy", String(point.y));
     dart.className = "dt-dart windup";
 
     later(() => {
@@ -216,8 +233,10 @@ export function DartThrowModal({ onClose }: { onClose: () => void }) {
         confetti(target.left, target.top);
         stamp.style.left = `${target.left + 46}px`;
         stamp.style.top = `${target.top - 18}px`;
+        stamp.textContent = point.label;
         stamp.className = "dt-stamp on";
         setResult(course);
+        setRegionLabel(point.label);
         setThrown(true);
 
         later(() => {
@@ -227,6 +246,28 @@ export function DartThrowModal({ onClose }: { onClose: () => void }) {
         }, 460);
       }, 700);
     }, 340);
+  };
+
+  const go = async () => {
+    if (busyRef.current) return;
+    busyRef.current = true;
+    setError(null);
+    setLoading(true);
+
+    let course: RecommendCourse;
+    try {
+      course = await getRecommendCourse();
+    } catch {
+      if (!aliveRef.current) return;
+      setLoading(false);
+      setError("코스를 불러오지 못했어요. 잠시 후 다시 시도해 주세요.");
+      busyRef.current = false;
+      return;
+    }
+    if (!aliveRef.current) return;
+
+    setLoading(false);
+    animateThrow(course);
   };
 
   return (
@@ -278,31 +319,71 @@ export function DartThrowModal({ onClose }: { onClose: () => void }) {
             </div>
           </div>
           <div className="dt-right">
-            <div className={`dt-resting${thrown ? " gone" : ""}`}>
-              <div>
-                아직 뽑지 않았어요
-                <br />
-                다트를 던지면 코스가 나타나요
+            {!thrown && !error && (
+              <div className="dt-resting">
+                <div>
+                  아직 뽑지 않았어요
+                  <br />
+                  다트를 던지면 코스가 나타나요
+                </div>
               </div>
-            </div>
+            )}
+            {error && <div className="dt-err">{error}</div>}
+
             <div className={`dt-card${thrown ? "" : " hidden"}`} ref={cardRef}>
-              <span className="dt-tag">추천 코스</span>
-              <div className="dt-name">{result?.name}</div>
-              <div className="dt-desc">{result?.desc}</div>
+              {result?.imgUrl && (
+                <Image
+                  className="dt-thumb"
+                  src={result.imgUrl}
+                  alt=""
+                  width={520}
+                  height={140}
+                  unoptimized
+                />
+              )}
+              <span className="dt-tag">{result?.theme ?? "추천 코스"}</span>
+              <div className="dt-name">{result?.title}</div>
+              <div className="dt-addr">📍 {result?.addr1}</div>
+              {result?.overview && <div className="dt-desc">{result.overview}</div>}
               <div className="dt-meta">
-                {(result?.meta ?? []).map((t) => (
-                  <span key={t}>{t}</span>
-                ))}
+                {regionLabel && <span>{regionLabel}</span>}
+                {result?.takeTime && <span>{result.takeTime}</span>}
+                {result?.distance && <span>{result.distance}</span>}
               </div>
+
+              {!!result?.spots?.length && (
+                <div className="dt-spots">
+                  <div className="dt-spots-h">코스에 담긴 곳 {result.spots.length}곳</div>
+                  {result.spots.map((spot) => (
+                    <div className="dt-spot" key={spot.subContentId}>
+                      {spot.imgUrl && (
+                        <Image
+                          className="dt-spot-img"
+                          src={spot.imgUrl}
+                          alt={spot.imgAlt ?? ""}
+                          width={52}
+                          height={52}
+                          unoptimized
+                        />
+                      )}
+                      <div>
+                        <div className="dt-spot-n">{spot.name}</div>
+                        {spot.overview && <div className="dt-spot-o">{spot.overview}</div>}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
+
             <div className="dt-btns">
               {thrown && (
-                <button className="dt-again" onClick={go}>
+                <button className="dt-again" onClick={go} disabled={loading}>
                   다시
                 </button>
               )}
-              <button className="dt-throw" onClick={go}>
-                {thrown ? "한 번 더 던지기" : "다트 던지기"}
+              <button className="dt-throw" onClick={go} disabled={loading}>
+                {loading ? "코스를 뽑는 중…" : thrown ? "한 번 더 던지기" : "다트 던지기"}
               </button>
             </div>
           </div>
