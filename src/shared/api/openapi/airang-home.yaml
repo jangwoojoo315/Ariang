@@ -59,6 +59,23 @@ paths:
                 items:
                   $ref: '#/components/schemas/TourSpot'
 
+  /api/culture:
+    get:
+      summary: 인기 문화관광지 Top5
+      operationId: getCultureTourTop5
+      tags:
+        - Home
+      responses:
+        '200':
+          description: 성공
+          content:
+            application/json:
+              schema:
+                type: array
+                maxItems: 5
+                items:
+                  $ref: '#/components/schemas/TourSpot'
+
   /api/recently-opened:
     get:
       summary: 새로 생긴 곳 (30일 이내)

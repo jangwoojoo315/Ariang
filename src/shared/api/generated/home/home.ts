@@ -321,6 +321,98 @@ export function useGetNatureTourTop5<TData = Awaited<ReturnType<typeof getNature
 
 
 /**
+ * @summary 인기 문화관광지 Top5
+ */
+export const getCultureTourTop5 = (
+
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<TourSpot[]>(
+      {url: `/api/culture`, method: 'GET', signal
+    },
+      );
+    }
+
+
+
+
+export const getGetCultureTourTop5QueryKey = () => {
+    return [
+    `/api/culture`
+    ] as const;
+    }
+
+
+export const getGetCultureTourTop5QueryOptions = <TData = Awaited<ReturnType<typeof getCultureTourTop5>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getCultureTourTop5>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetCultureTourTop5QueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getCultureTourTop5>>> = ({ signal }) => getCultureTourTop5(signal);
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getCultureTourTop5>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetCultureTourTop5QueryResult = NonNullable<Awaited<ReturnType<typeof getCultureTourTop5>>>
+export type GetCultureTourTop5QueryError = unknown
+
+
+export function useGetCultureTourTop5<TData = Awaited<ReturnType<typeof getCultureTourTop5>>, TError = unknown>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getCultureTourTop5>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getCultureTourTop5>>,
+          TError,
+          Awaited<ReturnType<typeof getCultureTourTop5>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetCultureTourTop5<TData = Awaited<ReturnType<typeof getCultureTourTop5>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getCultureTourTop5>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getCultureTourTop5>>,
+          TError,
+          Awaited<ReturnType<typeof getCultureTourTop5>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetCultureTourTop5<TData = Awaited<ReturnType<typeof getCultureTourTop5>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getCultureTourTop5>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary 인기 문화관광지 Top5
+ */
+
+export function useGetCultureTourTop5<TData = Awaited<ReturnType<typeof getCultureTourTop5>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getCultureTourTop5>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetCultureTourTop5QueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+/**
  * @summary 새로 생긴 곳 (30일 이내)
  */
 export const getRecentlyOpened = (

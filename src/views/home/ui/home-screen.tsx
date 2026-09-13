@@ -10,6 +10,7 @@ import {
   useGetHistoryTourTop5,
   useGetExperienceTourTop5,
   useGetNatureTourTop5,
+  useGetCultureTourTop5,
   useGetRecentlyOpened,
 } from "@/shared/api/generated/home/home";
 import { DartFab } from "@/features/random-course-dart";
@@ -34,9 +35,10 @@ export function HomeScreen({ onSelectItem }: Props) {
   const historyTour = useGetHistoryTourTop5();
   const experienceTour = useGetExperienceTourTop5();
   const natureTour = useGetNatureTourTop5();
+  const cultureTour = useGetCultureTourTop5();
   const recentlyOpened = useGetRecentlyOpened();
 
-  // 각 Top5 쿼리의 1위(top1) 여행지 3곳으로 배너 슬라이드 구성.
+  // 각 Top5 쿼리의 1위(top1) 여행지 4곳으로 배너 슬라이드 구성.
   const bannerSlides = [
     historyTour.data?.[0] && {
       spot: historyTour.data[0],
@@ -52,6 +54,11 @@ export function HomeScreen({ onSelectItem }: Props) {
       spot: natureTour.data[0],
       theme: "forest" as Theme,
       label: "🌲 지금 인기 자연관광지",
+    },
+    cultureTour.data?.[0] && {
+      spot: cultureTour.data[0],
+      theme: "geology" as Theme,
+      label: "🏯 지금 인기 문화관광지",
     },
   ].filter(Boolean) as BannerSlide[];
 
@@ -107,6 +114,17 @@ export function HomeScreen({ onSelectItem }: Props) {
             cardCols={cardCols}
             px={px}
             theme="forest"
+            onSelectItem={onSelectItem}
+          />
+          <TourSection
+            title="🏯 지금 인기 문화관광지 Top 5"
+            items={cultureTour.data}
+            isLoading={cultureTour.isLoading}
+            isError={cultureTour.isError}
+            isMobile={isMobile}
+            cardCols={cardCols}
+            px={px}
+            theme="geology"
             onSelectItem={onSelectItem}
           />
           <TourSection
