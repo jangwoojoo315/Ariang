@@ -1,8 +1,7 @@
 'use client';
 import { useState } from 'react';
 import { BottomSheet, Modal, PrimaryBtn, PlaceholderImg, ThemeChip, KakaoMap } from '@/shared/ui';
-import { IcoXClose, IcoCalendar, IcoRoute, IcoCheck2, IcoStroller } from '@/shared/ui';
-import { FESTIVALS } from '@/entities/spot';
+import { IcoXClose, IcoCalendar, IcoCheck2, IcoStroller } from '@/shared/ui';
 import type { SpotOrFestival } from '@/shared/types';
 
 function IconStroller({ size=22, color='currentColor' }: { size?:number; color?:string }) {
@@ -55,10 +54,6 @@ export function TripSaveModal({ item, onClose, onSave }: { item: SpotOrFestival;
   const [useRecommended, setUseRecommended] = useState(true);
   const today = new Date().toISOString().slice(0,10);
 
-  const suggested = 'dateRange' in item
-    ? []
-    : FESTIVALS.filter(f => f.theme === item.theme).slice(0,1);
-
   return (
     <Modal onClose={onClose}>
       <div style={{ display:'flex', alignItems:'center', gap:10, marginBottom:4 }}>
@@ -95,26 +90,6 @@ export function TripSaveModal({ item, onClose, onSave }: { item: SpotOrFestival;
             style={{ width:'100%', border:'1.5px solid var(--border)', borderRadius:12, padding:'11px 14px', fontSize:15, background:'var(--bg)', color:'var(--text)' }} />
         )}
       </div>
-
-      {suggested.length > 0 && (
-        <div style={{ background:'var(--tag-bg)', borderRadius:14, padding:'12px 14px', marginBottom:18 }}>
-          <div style={{ fontSize:12, fontWeight:700, color:'var(--primary)', marginBottom:10, display:'flex', alignItems:'center', gap:6 }}>
-            <IcoRoute size={13} color="var(--primary)" />같은 날 함께 가면 좋은 곳
-          </div>
-          {suggested.map(b => (
-            <div key={b.id} style={{ display:'flex', alignItems:'center', gap:10 }}>
-              <div style={{ width:52, height:44, borderRadius:10, overflow:'hidden', flexShrink:0 }}>
-                <PlaceholderImg theme={b.theme} img={b.img} height={44} />
-              </div>
-              <div style={{ flex:1, minWidth:0 }}>
-                <div style={{ fontSize:13, fontWeight:700, whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis' }}>{b.name}</div>
-                <div style={{ fontSize:11, color:'var(--text2)', marginTop:2 }}>{b.region}</div>
-              </div>
-              <ThemeChip theme={b.theme} small />
-            </div>
-          ))}
-        </div>
-      )}
 
       <button
         onClick={() => setUseRecommended(v => !v)}
