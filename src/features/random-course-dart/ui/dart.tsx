@@ -72,11 +72,17 @@ const DART_CSS = `
 .dt-meta span{background:var(--tag-bg);color:var(--primary-dark);font-size:12px;font-weight:700;padding:5px 10px;border-radius:8px}
 .dt-spots{margin-top:20px;border-top:1px solid var(--border);padding-top:16px}
 .dt-spots-h{font-size:12px;font-weight:800;color:var(--text3);letter-spacing:.04em;margin-bottom:10px}
-.dt-spot{display:flex;gap:10px;align-items:flex-start;padding:8px 0}
+.dt-spot{display:flex;gap:10px;align-items:flex-start;padding:8px 0;width:100%;text-align:left;background:none;border:0;font:inherit;color:inherit}
 .dt-spot + .dt-spot{border-top:1px solid var(--border)}
+.dt-spot.tappable{cursor:pointer}
+.dt-spot.tappable:hover .dt-spot-n{color:var(--primary)}
 .dt-spot-img{width:52px;height:52px;object-fit:cover;border-radius:10px;flex-shrink:0;background:var(--tag-bg)}
-.dt-spot-n{font-size:13.5px;font-weight:700;color:var(--text);line-height:1.4}
-.dt-spot-o{font-size:12px;color:var(--text2);line-height:1.55;margin-top:3px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.dt-spot-body{flex:1;min-width:0}
+.dt-spot-n{font-size:13.5px;font-weight:700;color:var(--text);line-height:1.4;display:flex;align-items:center;gap:5px;transition:color .15s}
+.dt-spot-caret{font-size:9px;color:var(--text3);flex-shrink:0;transition:transform .2s}
+.dt-spot-caret.up{transform:rotate(180deg)}
+.dt-spot-o{font-size:12px;color:var(--text2);line-height:1.55;margin-top:3px;white-space:pre-line;word-break:break-word}
+.dt-spot-o.clamp{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .dt-btns{display:flex;gap:10px;position:sticky;bottom:0;background:linear-gradient(to bottom,transparent,var(--bg) 30%);padding-top:14px;margin-top:auto}
 .dt-btns button{border:0;font-family:inherit;font-size:15px;font-weight:700;padding:15px;border-radius:14px;cursor:pointer;transition:transform .12s,opacity .2s}
 .dt-btns button:active{transform:scale(.97)}
@@ -130,6 +136,8 @@ export function DartThrowModal({ onClose }: { onClose: () => void }) {
   const [thrown, setThrown] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  // 설명을 펼쳐 놓은 코스 구성 관광지 id 모음
+  const [expandedSpots, setExpandedSpots] = useState<string[]>([]);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -236,6 +244,7 @@ export function DartThrowModal({ onClose }: { onClose: () => void }) {
         stamp.textContent = point.label;
         stamp.className = "dt-stamp on";
         setResult(course);
+        setExpandedSpots([]);
         setRegionLabel(point.label);
         setThrown(true);
 
@@ -354,24 +363,51 @@ export function DartThrowModal({ onClose }: { onClose: () => void }) {
               {!!result?.spots?.length && (
                 <div className="dt-spots">
                   <div className="dt-spots-h">코스에 담긴 곳 {result.spots.length}곳</div>
-                  {result.spots.map((spot) => (
-                    <div className="dt-spot" key={spot.subContentId}>
-                      {spot.imgUrl && (
-                        <Image
-                          className="dt-spot-img"
-                          src={spot.imgUrl}
-                          alt={spot.imgAlt ?? ""}
-                          width={52}
-                          height={52}
-                          unoptimized
-                        />
-                      )}
-                      <div>
-                        <div className="dt-spot-n">{spot.name}</div>
-                        {spot.overview && <div className="dt-spot-o">{spot.overview}</div>}
-                      </div>
-                    </div>
-                  ))}
+                  {result.spots.map((spot) => {
+                    const open = expandedSpots.includes(spot.subContentId);
+                    // 설명이 있을 때만 눌러서 펼칠 수 있다
+                    const tappable = !!spot.overview;
+                    return (
+                      <button
+                        type="button"
+                        className={`dt-spot${tappable ? " tappable" : ""}`}
+                        key={spot.subContentId}
+                        aria-expanded={tappable ? open : undefined}
+                        onClick={() => {
+                          if (!tappable) return;
+                          setExpandedSpots((prev) =>
+                            prev.includes(spot.subContentId)
+                              ? prev.filter((id) => id !== spot.subContentId)
+                              : [...prev, spot.subContentId],
+                          );
+                        }}
+                      >
+                        {spot.imgUrl && (
+                          <Image
+                            className="dt-spot-img"
+                            src={spot.imgUrl}
+                            alt={spot.imgAlt ?? ""}
+                            width={52}
+                            height={52}
+                            unoptimized
+                          />
+                        )}
+                        <div className="dt-spot-body">
+                          <div className="dt-spot-n">
+                            <span>{spot.name}</span>
+                            {tappable && (
+                              <span className={`dt-spot-caret${open ? " up" : ""}`}>▾</span>
+                            )}
+                          </div>
+                          {spot.overview && (
+                            <div className={`dt-spot-o${open ? "" : " clamp"}`}>
+                              {spot.overview}
+                            </div>
+                          )}
+                        </div>
+                      </button>
+                    );
+                  })}
                 </div>
               )}
             </div>
