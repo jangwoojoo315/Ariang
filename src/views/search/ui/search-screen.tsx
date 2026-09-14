@@ -657,7 +657,7 @@ function FilterSheet({
           <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
             {(
               [
-                ["stroller", IcoStroller, "유아차 대역"],
+                ["stroller", IcoStroller, "유아차 대여"],
                 ["parking", IcoCar, "주차장"],
                 ["accessible", IcoAccessible, "화장실"],
               ] as [
