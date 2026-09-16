@@ -10,7 +10,6 @@ import {
   IcoSearch,
   IcoFilter,
   IcoStroller,
-  IcoMilk,
   IcoCar,
   IcoAccessible,
   IcoReset,
@@ -431,43 +430,32 @@ function SearchCard({
         <div style={{ fontSize: 11, color: "var(--text2)", marginBottom: 5 }}>
           {item.region}
         </div>
-        <div style={{ display: "flex", gap: 4, flexWrap: "wrap" }}>
-          {item.stroller && (
+        <div style={{ display: "flex", gap: 5, flexWrap: "wrap" }}>
+          {/* 홈 관광지 카드와 같은 구성 — 없는 항목도 회색으로 함께 보여준다 */}
+          {[
+            { key: "stroller", label: "유아차 대여", Icon: IcoStroller, ok: item.stroller },
+            { key: "parking", label: "주차", Icon: IcoCar, ok: item.parking },
+            { key: "toilet", label: "화장실", Icon: IcoAccessible, ok: item.accessible },
+          ].map((b) => (
             <span
+              key={b.key}
               style={{
-                fontSize: 10,
-                color: "var(--primary)",
-                background: "var(--tag-bg)",
-                padding: "2px 6px",
-                borderRadius: 10,
-                fontWeight: 600,
                 display: "flex",
                 alignItems: "center",
-                gap: 3,
-              }}
-            >
-              <IcoStroller size={10} color="var(--primary)" />
-              유아차
-            </span>
-          )}
-          {item.nursing && (
-            <span
-              style={{
+                gap: 4,
+                padding: "3px 8px",
+                borderRadius: 20,
                 fontSize: 10,
-                color: "var(--primary)",
-                background: "var(--tag-bg)",
-                padding: "2px 6px",
-                borderRadius: 10,
                 fontWeight: 600,
-                display: "flex",
-                alignItems: "center",
-                gap: 3,
+                background: b.ok ? "var(--tag-bg)" : "#F2F2F2",
+                color: b.ok ? "var(--primary)" : "#C0C0C0",
+                border: `1px solid ${b.ok ? "var(--border)" : "#EBEBEB"}`,
               }}
             >
-              <IcoMilk size={10} color="var(--primary)" />
-              수유실
+              <b.Icon size={10} color={b.ok ? "var(--primary)" : "#C0C0C0"} />
+              <span>{b.label}</span>
             </span>
-          )}
+          ))}
         </div>
       </div>
     </div>
