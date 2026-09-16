@@ -2,7 +2,6 @@
 import { useMemo, useState, useEffect, useRef } from "react";
 import {
   PlaceholderImg,
-  ThemeChip,
   BottomSheet,
   PrimaryBtn,
 } from "@/shared/ui";
@@ -409,13 +408,11 @@ function SearchCard({
         )}
       </div>
       <div style={{ padding: "9px 10px 11px" }}>
-        <ThemeChip theme={item.theme} small />
         <div
           style={
             {
               fontWeight: 700,
               fontSize: 13,
-              marginTop: 5,
               marginBottom: 2,
               lineHeight: 1.3,
               overflow: "hidden",
