@@ -88,7 +88,6 @@ const DART_CSS = `
 .dt-btns button:active{transform:scale(.97)}
 .dt-btns button:disabled{opacity:.6;cursor:default;transform:none}
 .dt-throw{flex:1;background:var(--primary);color:#fff}
-.dt-again{flex:0 0 104px;background:var(--tag-bg);color:var(--primary-dark)}
 .dt-fab{position:absolute;right:24px;bottom:24px;z-index:40;width:60px;height:60px;border:0;border-radius:50%;background:var(--primary);color:#fff;box-shadow:0 8px 24px rgba(38,96,78,.34);cursor:pointer;display:grid;place-items:center;transition:transform .15s,box-shadow .15s}
 .dt-fab:hover{transform:translateY(-2px) scale(1.04);box-shadow:0 12px 30px rgba(38,96,78,.4)}
 .dt-fab:active{transform:scale(.95)}
@@ -420,11 +419,6 @@ export function DartThrowModal({ onClose }: { onClose: () => void }) {
             </div>
 
             <div className="dt-btns">
-              {thrown && (
-                <button className="dt-again" onClick={go} disabled={loading}>
-                  다시
-                </button>
-              )}
               <button className="dt-throw" onClick={go} disabled={loading}>
                 {loading ? "코스를 뽑는 중…" : thrown ? "한 번 더 던지기" : "다트 던지기"}
               </button>
