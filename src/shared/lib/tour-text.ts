@@ -12,9 +12,10 @@ export function cleanTourText(raw: string | null | undefined): string {
       // 문자열로 들어온 이스케이프 → 실제 줄바꿈
       .replace(/\\r\\n|\\n|\\r/g, "\n")
       .replace(/\\t/g, " ")
-      // 줄바꿈 의미를 가진 태그
-      .replace(/<\s*br\s*\/?\s*>/gi, "\n")
-      .replace(/<\s*\/?\s*p[^>]*>/gi, "\n")
+      // 줄바꿈 의미를 가진 태그. 앞뒤 공백까지 함께 먹어 <br> 뒤에 실제 줄바꿈이
+      // 또 있어도 빈 줄이 생기지 않게 한다 (<br><br>는 그대로 빈 줄로 남는다)
+      .replace(/\s*<\s*br\s*\/?\s*>\s*/gi, "\n")
+      .replace(/\s*<\s*\/?\s*p[^>]*>\s*/gi, "\n")
       // 나머지 태그 제거
       .replace(/<[^>]+>/g, "")
       // HTML 엔티티 (&amp;는 이중 복원을 막으려고 마지막에)
