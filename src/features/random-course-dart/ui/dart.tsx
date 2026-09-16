@@ -33,6 +33,7 @@ const DART_CSS = `
 .dt-map{width:100%;display:block;overflow:visible}
 .dt-land{fill:none;stroke:#9C8A64;stroke-width:2.4;stroke-linejoin:round}
 .dt-hatch{fill:#E9DFC4;opacity:.65}
+.dt-islet{stroke-width:1.5}
 .dt-mark{fill:var(--accent);opacity:0;transition:opacity .4s}
 .dt-mark.on{opacity:.8}
 .dt-burst{position:absolute;width:6px;height:6px;border-radius:2px;opacity:0;pointer-events:none}
@@ -307,6 +308,12 @@ export function DartThrowModal({ onClose }: { onClose: () => void }) {
                   <path className="dt-land" d={KOREA_D} />
                   <ellipse className="dt-hatch" cx="118" cy="344" rx="30" ry="15" />
                   <ellipse className="dt-land" cx="118" cy="344" rx="30" ry="15" />
+                  {/* 울릉도 — 실제 거리대로 두면 지도 밖으로 나가 동해 쪽에 당겨 그린다 */}
+                  <circle className="dt-hatch" cx="258" cy="104" r="5.5" />
+                  <circle className="dt-land dt-islet" cx="258" cy="104" r="5.5" />
+                  {/* 독도 */}
+                  <circle className="dt-hatch" cx="277" cy="114" r="2.6" />
+                  <circle className="dt-land dt-islet" cx="277" cy="114" r="2.6" />
                   <circle className="dt-mark" ref={markRef} r="22" />
                 </svg>
                 <svg className="dt-trailsvg">
