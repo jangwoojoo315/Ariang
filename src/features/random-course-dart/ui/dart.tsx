@@ -361,22 +361,24 @@ export function DartThrowModal({ onClose }: { onClose: () => void }) {
               {!!result?.spots?.length && (
                 <div className="dt-spots">
                   <div className="dt-spots-h">코스에 담긴 곳 {result.spots.length}곳</div>
-                  {result.spots.map((spot) => {
-                    const open = expandedSpots.includes(spot.subContentId);
+                  {result.spots.map((spot, index) => {
+                    // 같은 관광지가 두 번 내려오는 코스가 있어 순번까지 붙여 행을 구분한다
+                    const rowId = `${spot.subContentId}-${index}`;
+                    const open = expandedSpots.includes(rowId);
                     // 설명이 있을 때만 눌러서 펼칠 수 있다
                     const tappable = !!spot.overview;
                     return (
                       <button
                         type="button"
                         className={`dt-spot${tappable ? " tappable" : ""}`}
-                        key={spot.subContentId}
+                        key={rowId}
                         aria-expanded={tappable ? open : undefined}
                         onClick={() => {
                           if (!tappable) return;
                           setExpandedSpots((prev) =>
-                            prev.includes(spot.subContentId)
-                              ? prev.filter((id) => id !== spot.subContentId)
-                              : [...prev, spot.subContentId],
+                            prev.includes(rowId)
+                              ? prev.filter((id) => id !== rowId)
+                              : [...prev, rowId],
                           );
                         }}
                       >
