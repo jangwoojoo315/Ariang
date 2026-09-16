@@ -4,7 +4,7 @@ import Image from "next/image";
 import { mapTourSpotToSpot } from "@/entities/spot";
 import { REGION_LABELS } from "@/shared/api/region-labels";
 import { useWindowWidth } from "@/shared/lib";
-import type { SpotOrFestival, Bundle, Theme } from "@/shared/types";
+import type { SpotOrFestival, Theme } from "@/shared/types";
 import type { TourSpot } from "@/shared/api/generated/model";
 import {
   useGetHistoryTourTop5,
@@ -18,9 +18,6 @@ import { TourSection } from "./tour-section";
 
 interface Props {
   onSelectItem: (item: SpotOrFestival) => void;
-  onSelectBundle: (bundle: Bundle) => void;
-  onAddTrip: (item: SpotOrFestival, date: string) => void;
-  savedTrips: { itemId: string }[];
 }
 
 type BannerSlide = { spot: TourSpot; theme: Theme; label: string };

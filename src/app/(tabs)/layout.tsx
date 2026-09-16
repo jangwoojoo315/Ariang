@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
-import { DetailSheet, BundleDetailSheet } from "@/views/detail";
+import { DetailSheet } from "@/views/detail";
 import { LoginScreen } from "@/views/auth";
 import { Modal, PrimaryBtn } from "@/shared/ui";
 import { useWindowWidth, useIsAuthenticated } from "@/shared/lib";
@@ -11,7 +11,7 @@ import {
   createMyTour,
   getGetMyTourListQueryKey,
 } from "@/shared/api/generated/my-tour/my-tour";
-import type { SpotOrFestival, Bundle } from "@/shared/types";
+import type { SpotOrFestival } from "@/shared/types";
 import { TabsProvider } from "./tabs-context";
 
 const NAV = [
@@ -29,7 +29,6 @@ export default function TabsLayout({ children }: { children: React.ReactNode }) 
   const router = useRouter();
 
   const [selectedItem, setSelectedItem] = useState<SpotOrFestival | null>(null);
-  const [selectedBundle, setSelectedBundle] = useState<Bundle | null>(null);
   const [saveError, setSaveError] = useState<string | null>(null);
   const [loginNeeded, setLoginNeeded] = useState(false);
 
@@ -46,7 +45,6 @@ export default function TabsLayout({ children }: { children: React.ReactNode }) 
   const goLogin = () => {
     setLoginNeeded(false);
     setSelectedItem(null);
-    setSelectedBundle(null);
     router.push("/trips");
   };
 
@@ -85,7 +83,6 @@ export default function TabsLayout({ children }: { children: React.ReactNode }) 
     <TabsProvider
       value={{
         onSelectItem: setSelectedItem,
-        onSelectBundle: setSelectedBundle,
         onSaveTrip: handleSaveTrip,
         savedTrips,
       }}
@@ -277,19 +274,6 @@ export default function TabsLayout({ children }: { children: React.ReactNode }) 
           </Modal>
         )}
 
-        {/* Bundle detail sheet */}
-        {selectedBundle && (
-          <BundleDetailSheet
-            bundle={selectedBundle}
-            onClose={() => setSelectedBundle(null)}
-            onSelectItem={(item) => {
-              setSelectedBundle(null);
-              setSelectedItem(item);
-            }}
-            onSaveTrip={handleSaveTrip}
-            savedTrips={savedTrips}
-          />
-        )}
       </div>
     </TabsProvider>
   );
