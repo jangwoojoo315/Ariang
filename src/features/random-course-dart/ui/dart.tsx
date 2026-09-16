@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
+import { cleanTourText } from "@/shared/lib";
 import { getRecommendCourse } from "@/shared/api/generated/home/home";
 import type { RecommendCourse } from "@/shared/api/generated/model";
 import { resolveRegionPoint } from "../model/region-points";
@@ -68,7 +69,7 @@ const DART_CSS = `
 .dt-thumb{width:100%;height:140px;object-fit:cover;border-radius:12px;margin-bottom:16px;display:block;background:var(--tag-bg)}
 .dt-tag{display:inline-flex;background:var(--tag-bg);color:var(--primary-dark);font-size:11px;font-weight:700;padding:5px 11px;border-radius:20px;letter-spacing:.04em}
 .dt-name{font-size:22px;font-weight:800;color:var(--text);margin-top:12px;letter-spacing:-.4px;line-height:1.35}
-.dt-desc{font-size:14px;color:var(--text2);line-height:1.7;margin-top:10px;text-wrap:pretty}
+.dt-desc{font-size:14px;color:var(--text2);line-height:1.7;margin-top:10px;text-wrap:pretty;white-space:pre-line}
 .dt-meta{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
 .dt-meta span{background:var(--tag-bg);color:var(--primary-dark);font-size:12px;font-weight:700;padding:5px 10px;border-radius:8px}
 .dt-spots{margin-top:20px;border-top:1px solid var(--border);padding-top:16px}
@@ -359,7 +360,9 @@ export function DartThrowModal({ onClose }: { onClose: () => void }) {
                 )}
                 <span className="dt-tag">{result?.theme ?? "추천 코스"}</span>
                 <div className="dt-name">{result?.title}</div>
-                {result?.overview && <div className="dt-desc">{result.overview}</div>}
+                {result?.overview && (
+                  <div className="dt-desc">{cleanTourText(result.overview)}</div>
+                )}
                 <div className="dt-meta">
                   {regionLabel && <span>{regionLabel}</span>}
                   {result?.takeTime && <span>{result.takeTime}</span>}
@@ -373,8 +376,9 @@ export function DartThrowModal({ onClose }: { onClose: () => void }) {
                       // 같은 관광지가 두 번 내려오는 코스가 있어 순번까지 붙여 행을 구분한다
                       const rowId = `${spot.subContentId}-${index}`;
                       const open = expandedSpots.includes(rowId);
+                      const overview = cleanTourText(spot.overview);
                       // 설명이 있을 때만 눌러서 펼칠 수 있다
-                      const tappable = !!spot.overview;
+                      const tappable = !!overview;
                       return (
                         <button
                           type="button"
@@ -407,9 +411,9 @@ export function DartThrowModal({ onClose }: { onClose: () => void }) {
                                 <span className={`dt-spot-caret${open ? " up" : ""}`}>▾</span>
                               )}
                             </div>
-                            {spot.overview && (
+                            {overview && (
                               <div className={`dt-spot-o${open ? "" : " clamp"}`}>
-                                {spot.overview}
+                                {overview}
                               </div>
                             )}
                           </div>
