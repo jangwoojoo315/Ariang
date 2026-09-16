@@ -289,9 +289,7 @@ export function SettingsScreen() {
       <div style={{ paddingTop:0, paddingRight:px, paddingBottom:0, paddingLeft:px, marginBottom:24 }}>
         <div style={{ background:'var(--tag-bg)', borderRadius:14, padding:'12px 16px' }}>
           <div style={{ fontSize:11, color:'var(--text2)', lineHeight:1.7 }}>
-            📊 생태관광지 데이터: 한국관광공사 TourAPI<br />
-            ♿ 무장애 여행정보: 한국관광공사 무장애 여행정보<br />
-            🌿 축제 정보: 문화체육관광부 축제정보 서비스
+            데이터 출처 ⓒ한국관광공사
           </div>
         </div>
       </div>
