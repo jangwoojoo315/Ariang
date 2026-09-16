@@ -16,7 +16,8 @@ const CONFETTI_COLORS = ["#EF8970", "#E8B84B", "#3F8870", "#8FC2B1"];
 const DART_CSS = `
 .dt-ov{position:fixed;inset:0;z-index:200;display:flex;align-items:center;justify-content:center;padding:20px;background:rgba(24,38,30,.5);backdrop-filter:blur(3px);animation:dtFade .22s ease-out}
 @keyframes dtFade{from{opacity:0}to{opacity:1}}
-.dt-panel{position:relative;width:100%;max-width:900px;max-height:min(720px,calc(100vh - 40px));overflow-y:auto;background:var(--bg);border-radius:24px;box-shadow:0 30px 70px rgba(24,38,30,.3);animation:dtUp .3s cubic-bezier(.22,1.2,.36,1)}
+.dt-panel{position:relative;display:flex;flex-direction:column;width:100%;max-width:900px;max-height:min(720px,calc(100vh - 40px));overflow:hidden;background:var(--bg);border-radius:24px;box-shadow:0 30px 70px rgba(24,38,30,.3);animation:dtUp .3s cubic-bezier(.22,1.2,.36,1)}
+.dt-scroll{overflow-y:auto;min-height:0}
 @keyframes dtUp{from{opacity:0;transform:translateY(18px) scale(.98)}to{opacity:1;transform:none}}
 .dt-x{position:absolute;top:16px;right:16px;z-index:2;width:36px;height:36px;border:0;border-radius:50%;background:rgba(255,255,255,.9);box-shadow:0 2px 8px rgba(24,38,30,.14);cursor:pointer;display:grid;place-items:center;color:var(--text2);font-size:17px;line-height:1}
 .dt-grid{display:grid;grid-template-columns:1fr;gap:0}
@@ -289,139 +290,141 @@ export function DartThrowModal({ onClose }: { onClose: () => void }) {
         <button className="dt-x" onClick={onClose} aria-label="닫기">
           ✕
         </button>
-        <div className="dt-grid">
-          <div className="dt-left">
-            <div className="dt-kicker">RANDOM COURSE</div>
-            <div className="dt-h1">
-              지도에 다트를 던져
-              <br />
-              오늘의 코스를 뽑아요
-            </div>
-            <div className="dt-sub">
-              꽂힌 자리가 목적지. 아이랑이 그 지역의 가족 코스를 꺼내드려요.
-            </div>
-            <div className="dt-paper" ref={paperRef}>
-              <div className="dt-mapwrap" ref={mapWrapRef}>
-                <svg className="dt-map" viewBox="0 0 300 400">
-                  <path className="dt-hatch" d={KOREA_D} />
-                  <path className="dt-land" d={KOREA_D} />
-                  <ellipse className="dt-hatch" cx="118" cy="344" rx="30" ry="15" />
-                  <ellipse className="dt-land" cx="118" cy="344" rx="30" ry="15" />
-                  {/* 울릉도 — 실제 거리대로 두면 지도 밖으로 나가 동해 쪽에 당겨 그린다 */}
-                  <circle className="dt-hatch" cx="258" cy="104" r="5.5" />
-                  <circle className="dt-land dt-islet" cx="258" cy="104" r="5.5" />
-                  {/* 독도 */}
-                  <circle className="dt-hatch" cx="277" cy="114" r="2.6" />
-                  <circle className="dt-land dt-islet" cx="277" cy="114" r="2.6" />
-                  <circle className="dt-mark" ref={markRef} r="22" />
-                </svg>
-                <svg className="dt-trailsvg">
-                  <path ref={trailRef} />
-                </svg>
-                <div className="dt-dart" ref={dartRef}>
-                  <svg viewBox="0 0 26 112" width="26" height="112">
-                    <path d="M13,112 L8,84 L18,84 Z" fill="#C9C2B4" />
-                    <rect x="10" y="38" width="6" height="48" rx="2.5" fill="#7E7361" />
-                    <rect x="9" y="28" width="8" height="12" rx="2" fill="#F0C56A" />
-                    <path d="M13,3 L24,23 L18,31 L13,19 L8,31 L2,23 Z" fill="#EE9A5C" />
+        <div className="dt-scroll">
+          <div className="dt-grid">
+            <div className="dt-left">
+              <div className="dt-kicker">RANDOM COURSE</div>
+              <div className="dt-h1">
+                지도에 다트를 던져
+                <br />
+                오늘의 코스를 뽑아요
+              </div>
+              <div className="dt-sub">
+                꽂힌 자리가 목적지. 아이랑이 그 지역의 가족 코스를 꺼내드려요.
+              </div>
+              <div className="dt-paper" ref={paperRef}>
+                <div className="dt-mapwrap" ref={mapWrapRef}>
+                  <svg className="dt-map" viewBox="0 0 300 400">
+                    <path className="dt-hatch" d={KOREA_D} />
+                    <path className="dt-land" d={KOREA_D} />
+                    <ellipse className="dt-hatch" cx="118" cy="344" rx="30" ry="15" />
+                    <ellipse className="dt-land" cx="118" cy="344" rx="30" ry="15" />
+                    {/* 울릉도 — 실제 거리대로 두면 지도 밖으로 나가 동해 쪽에 당겨 그린다 */}
+                    <circle className="dt-hatch" cx="258" cy="104" r="5.5" />
+                    <circle className="dt-land dt-islet" cx="258" cy="104" r="5.5" />
+                    {/* 독도 */}
+                    <circle className="dt-hatch" cx="277" cy="114" r="2.6" />
+                    <circle className="dt-land dt-islet" cx="277" cy="114" r="2.6" />
+                    <circle className="dt-mark" ref={markRef} r="22" />
                   </svg>
-                </div>
-                <div className="dt-stamp" ref={stampRef}>
-                  당첨
+                  <svg className="dt-trailsvg">
+                    <path ref={trailRef} />
+                  </svg>
+                  <div className="dt-dart" ref={dartRef}>
+                    <svg viewBox="0 0 26 112" width="26" height="112">
+                      <path d="M13,112 L8,84 L18,84 Z" fill="#C9C2B4" />
+                      <rect x="10" y="38" width="6" height="48" rx="2.5" fill="#7E7361" />
+                      <rect x="9" y="28" width="8" height="12" rx="2" fill="#F0C56A" />
+                      <path d="M13,3 L24,23 L18,31 L13,19 L8,31 L2,23 Z" fill="#EE9A5C" />
+                    </svg>
+                  </div>
+                  <div className="dt-stamp" ref={stampRef}>
+                    당첨
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-          <div className="dt-right">
-            {!thrown && !error && (
-              <div className="dt-resting">
-                <div>
-                  아직 뽑지 않았어요
-                  <br />
-                  다트를 던지면 코스가 나타나요
+            <div className="dt-right">
+              {!thrown && !error && (
+                <div className="dt-resting">
+                  <div>
+                    아직 뽑지 않았어요
+                    <br />
+                    다트를 던지면 코스가 나타나요
+                  </div>
                 </div>
-              </div>
-            )}
-            {error && <div className="dt-err">{error}</div>}
-
-            <div className={`dt-card${thrown ? "" : " hidden"}`} ref={cardRef}>
-              {result?.imgUrl && (
-                <Image
-                  className="dt-thumb"
-                  src={result.imgUrl}
-                  alt=""
-                  width={520}
-                  height={140}
-                  unoptimized
-                />
               )}
-              <span className="dt-tag">{result?.theme ?? "추천 코스"}</span>
-              <div className="dt-name">{result?.title}</div>
-              {result?.overview && <div className="dt-desc">{result.overview}</div>}
-              <div className="dt-meta">
-                {regionLabel && <span>{regionLabel}</span>}
-                {result?.takeTime && <span>{result.takeTime}</span>}
-                {result?.distance && <span>{result.distance}</span>}
-              </div>
+              {error && <div className="dt-err">{error}</div>}
 
-              {!!result?.spots?.length && (
-                <div className="dt-spots">
-                  <div className="dt-spots-h">코스에 담긴 곳 {result.spots.length}곳</div>
-                  {result.spots.map((spot, index) => {
-                    // 같은 관광지가 두 번 내려오는 코스가 있어 순번까지 붙여 행을 구분한다
-                    const rowId = `${spot.subContentId}-${index}`;
-                    const open = expandedSpots.includes(rowId);
-                    // 설명이 있을 때만 눌러서 펼칠 수 있다
-                    const tappable = !!spot.overview;
-                    return (
-                      <button
-                        type="button"
-                        className={`dt-spot${tappable ? " tappable" : ""}`}
-                        key={rowId}
-                        aria-expanded={tappable ? open : undefined}
-                        onClick={() => {
-                          if (!tappable) return;
-                          setExpandedSpots((prev) =>
-                            prev.includes(rowId)
-                              ? prev.filter((id) => id !== rowId)
-                              : [...prev, rowId],
-                          );
-                        }}
-                      >
-                        {spot.imgUrl && (
-                          <Image
-                            className="dt-spot-img"
-                            src={spot.imgUrl}
-                            alt={spot.imgAlt ?? ""}
-                            width={52}
-                            height={52}
-                            unoptimized
-                          />
-                        )}
-                        <div className="dt-spot-body">
-                          <div className="dt-spot-n">
-                            <span>{spot.name}</span>
-                            {tappable && (
-                              <span className={`dt-spot-caret${open ? " up" : ""}`}>▾</span>
+              <div className={`dt-card${thrown ? "" : " hidden"}`} ref={cardRef}>
+                {result?.imgUrl && (
+                  <Image
+                    className="dt-thumb"
+                    src={result.imgUrl}
+                    alt=""
+                    width={520}
+                    height={140}
+                    unoptimized
+                  />
+                )}
+                <span className="dt-tag">{result?.theme ?? "추천 코스"}</span>
+                <div className="dt-name">{result?.title}</div>
+                {result?.overview && <div className="dt-desc">{result.overview}</div>}
+                <div className="dt-meta">
+                  {regionLabel && <span>{regionLabel}</span>}
+                  {result?.takeTime && <span>{result.takeTime}</span>}
+                  {result?.distance && <span>{result.distance}</span>}
+                </div>
+
+                {!!result?.spots?.length && (
+                  <div className="dt-spots">
+                    <div className="dt-spots-h">코스에 담긴 곳 {result.spots.length}곳</div>
+                    {result.spots.map((spot, index) => {
+                      // 같은 관광지가 두 번 내려오는 코스가 있어 순번까지 붙여 행을 구분한다
+                      const rowId = `${spot.subContentId}-${index}`;
+                      const open = expandedSpots.includes(rowId);
+                      // 설명이 있을 때만 눌러서 펼칠 수 있다
+                      const tappable = !!spot.overview;
+                      return (
+                        <button
+                          type="button"
+                          className={`dt-spot${tappable ? " tappable" : ""}`}
+                          key={rowId}
+                          aria-expanded={tappable ? open : undefined}
+                          onClick={() => {
+                            if (!tappable) return;
+                            setExpandedSpots((prev) =>
+                              prev.includes(rowId)
+                                ? prev.filter((id) => id !== rowId)
+                                : [...prev, rowId],
+                            );
+                          }}
+                        >
+                          {spot.imgUrl && (
+                            <Image
+                              className="dt-spot-img"
+                              src={spot.imgUrl}
+                              alt={spot.imgAlt ?? ""}
+                              width={52}
+                              height={52}
+                              unoptimized
+                            />
+                          )}
+                          <div className="dt-spot-body">
+                            <div className="dt-spot-n">
+                              <span>{spot.name}</span>
+                              {tappable && (
+                                <span className={`dt-spot-caret${open ? " up" : ""}`}>▾</span>
+                              )}
+                            </div>
+                            {spot.overview && (
+                              <div className={`dt-spot-o${open ? "" : " clamp"}`}>
+                                {spot.overview}
+                              </div>
                             )}
                           </div>
-                          {spot.overview && (
-                            <div className={`dt-spot-o${open ? "" : " clamp"}`}>
-                              {spot.overview}
-                            </div>
-                          )}
-                        </div>
-                      </button>
-                    );
-                  })}
-                </div>
-              )}
-            </div>
+                        </button>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
 
-            <div className="dt-btns">
-              <button className="dt-throw" onClick={go} disabled={loading}>
-                {loading ? "코스를 뽑는 중…" : thrown ? "한 번 더 던지기" : "다트 던지기"}
-              </button>
+              <div className="dt-btns">
+                <button className="dt-throw" onClick={go} disabled={loading}>
+                  {loading ? "코스를 뽑는 중…" : thrown ? "한 번 더 던지기" : "다트 던지기"}
+                </button>
+              </div>
             </div>
           </div>
         </div>
