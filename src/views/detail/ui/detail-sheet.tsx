@@ -1,6 +1,6 @@
 'use client';
 import { useState } from 'react';
-import { BottomSheet, Modal, PrimaryBtn, PlaceholderImg, ThemeChip, KakaoMap } from '@/shared/ui';
+import { BottomSheet, Modal, PrimaryBtn, PlaceholderImg, KakaoMap } from '@/shared/ui';
 import { IcoXClose, IcoCalendar, IcoCheck2, IcoStroller } from '@/shared/ui';
 import type { SpotOrFestival } from '@/shared/types';
 
@@ -135,8 +135,7 @@ export function DetailSheet({ item, onClose, onSaveTrip }: { item: SpotOrFestiva
           onMouseLeave={e => e.currentTarget.style.background='rgba(0,0,0,0.45)'}
           ><IcoXClose size={16} color="#fff" /></button>
           <div style={{ position:'absolute', bottom:0, left:0, right:0, padding:'32px 20px 20px' }}>
-            <ThemeChip theme={item.theme} />
-            <div style={{ color:'#fff', fontWeight:800, fontSize:22, marginTop:8, lineHeight:1.3, textShadow:'0 1px 8px rgba(0,0,0,0.4)' }}>{item.name}</div>
+            <div style={{ color:'#fff', fontWeight:800, fontSize:22, lineHeight:1.3, textShadow:'0 1px 8px rgba(0,0,0,0.4)' }}>{item.name}</div>
             <div style={{ color:'rgba(255,255,255,0.85)', fontSize:13, marginTop:4 }}>
               {item.region}{'dateRange' in item && item.dateRange ? ` · ${item.dateRange}` : ''}
             </div>
