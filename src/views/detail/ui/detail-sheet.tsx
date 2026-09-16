@@ -1,6 +1,7 @@
 'use client';
 import { useState } from 'react';
 import { BottomSheet, Modal, PrimaryBtn, PlaceholderImg, KakaoMap } from '@/shared/ui';
+import { cleanTourText } from '@/shared/lib';
 import { IcoXClose, IcoCalendar, IcoCheck2, IcoStroller } from '@/shared/ui';
 import type { SpotOrFestival } from '@/shared/types';
 
@@ -36,13 +37,15 @@ function IconX({ size=18, color='currentColor' }: { size?:number; color?:string 
 }
 
 function InfoRow({ icon, label, value, last }: { icon: React.ReactNode; label:string; value?:string; last?:boolean }) {
-  if (!value) return null;
+  // TourAPI 원문에 <br />·&lt; 같은 태그와 문자 그대로의 \n이 섞여 온다
+  const text = cleanTourText(value);
+  if (!text) return null;
   return (
     <div style={{ display:'flex', gap:10, paddingBottom: last ? 0 : 8, marginBottom: last ? 0 : 8, borderBottom: last ? 'none' : '1px solid var(--border)' }}>
       <div style={{ width:24, height:24, borderRadius:8, background:'var(--tag-bg)', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0, marginTop:1 }}>{icon}</div>
       <div>
         <div style={{ fontSize:11, color:'var(--text2)', fontWeight:600, marginBottom:2 }}>{label}</div>
-        <div style={{ fontSize:13, lineHeight:1.5 }}>{value}</div>
+        <div style={{ fontSize:13, lineHeight:1.5, whiteSpace:'pre-line' }}>{text}</div>
       </div>
     </div>
   );
@@ -143,7 +146,7 @@ export function DetailSheet({ item, onClose, onSaveTrip }: { item: SpotOrFestiva
         </div>
 
         <div style={{ padding:'18px 20px' }}>
-          <div style={{ fontSize:14, color:'var(--text)', lineHeight:1.75, marginBottom:18 }}>{item.description}</div>
+          <div style={{ fontSize:14, color:'var(--text)', lineHeight:1.75, marginBottom:18, whiteSpace:'pre-line' }}>{cleanTourText(item.description)}</div>
 
           <div style={{ background:'linear-gradient(135deg, #E8F4ED 0%, #F0F7EC 100%)', border:'1.5px solid var(--border)', borderRadius:16, padding:16, marginBottom:18 }}>
             <div style={{ fontWeight:800, fontSize:13, color:'var(--primary)', marginBottom:12, display:'flex', alignItems:'center', gap:6 }}>
