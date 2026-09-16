@@ -57,7 +57,7 @@ const DART_CSS = `
 .dt-stamp{position:absolute;font-size:12px;font-weight:800;color:var(--accent);border:2px solid var(--accent);padding:2px 7px;border-radius:4px;transform:translate(-50%,-50%) rotate(-9deg);opacity:0;letter-spacing:.06em;white-space:nowrap}
 .dt-stamp.on{animation:dtStamp .5s cubic-bezier(.2,1.6,.4,1) forwards}
 @keyframes dtStamp{0%{opacity:0;transform:translate(-50%,-50%) rotate(-9deg) scale(1.8)}100%{opacity:1;transform:translate(-50%,-50%) rotate(-9deg) scale(1)}}
-.dt-right{padding:34px 30px 30px;display:flex;flex-direction:column;gap:16px;border-top:1px solid var(--border)}
+.dt-right{padding:34px 30px 0;display:flex;flex-direction:column;gap:16px;border-top:1px solid var(--border)}
 @media(min-width:820px){.dt-right{border-top:0;border-left:1px solid var(--border)}}
 .dt-resting{flex:1;min-height:140px;display:flex;align-items:center;justify-content:center;text-align:center;border:1.5px dashed var(--border);border-radius:18px;padding:28px 20px;font-size:14px;color:var(--text3);line-height:1.7}
 .dt-err{border:1.5px solid var(--accent);background:var(--accent-light);color:var(--primary-dark);border-radius:18px;padding:18px 20px;font-size:13px;line-height:1.7;text-align:center}
@@ -83,7 +83,7 @@ const DART_CSS = `
 .dt-spot-caret.up{transform:rotate(180deg)}
 .dt-spot-o{font-size:12px;color:var(--text2);line-height:1.55;margin-top:3px;white-space:pre-line;word-break:break-word}
 .dt-spot-o.clamp{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-.dt-btns{display:flex;gap:10px;position:sticky;bottom:0;background:linear-gradient(to bottom,transparent,var(--bg) 30%);padding-top:14px;margin-top:auto}
+.dt-btns{display:flex;gap:10px;position:sticky;bottom:0;background:linear-gradient(to bottom,transparent,var(--bg) 24%);padding:16px 0 30px;margin-top:auto}
 .dt-btns button{border:0;font-family:inherit;font-size:15px;font-weight:700;padding:15px;border-radius:14px;cursor:pointer;transition:transform .12s,opacity .2s}
 .dt-btns button:active{transform:scale(.97)}
 .dt-btns button:disabled{opacity:.6;cursor:default;transform:none}
