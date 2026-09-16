@@ -5,11 +5,12 @@
  * OpenAPI spec version: 0.0.1
  */
 import type { CourseSpot } from './courseSpot';
+import type { Region } from './region';
 
 export interface RecommendCourse {
   contentId: string;
   title: string;
-  addr1: string;
+  region: Region;
   /** @nullable */
   imgUrl: string | null;
   /** @nullable */

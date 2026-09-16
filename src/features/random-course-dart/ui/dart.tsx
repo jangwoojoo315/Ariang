@@ -66,7 +66,6 @@ const DART_CSS = `
 .dt-thumb{width:100%;height:140px;object-fit:cover;border-radius:12px;margin-bottom:16px;display:block;background:var(--tag-bg)}
 .dt-tag{display:inline-flex;background:var(--tag-bg);color:var(--primary-dark);font-size:11px;font-weight:700;padding:5px 11px;border-radius:20px;letter-spacing:.04em}
 .dt-name{font-size:22px;font-weight:800;color:var(--text);margin-top:12px;letter-spacing:-.4px;line-height:1.35}
-.dt-addr{font-size:12.5px;color:var(--text3);margin-top:8px;line-height:1.55}
 .dt-desc{font-size:14px;color:var(--text2);line-height:1.7;margin-top:10px;text-wrap:pretty}
 .dt-meta{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
 .dt-meta span{background:var(--tag-bg);color:var(--primary-dark);font-size:12px;font-weight:700;padding:5px 10px;border-radius:8px}
@@ -207,8 +206,8 @@ export function DartThrowModal({ onClose }: { onClose: () => void }) {
     stamp.className = "dt-stamp";
     mark.setAttribute("class", "dt-mark");
 
-    // 주소 앞머리(시도)로 꽂을 자리를 정한다.
-    const point = resolveRegionPoint(course.addr1);
+    // 코스의 지역(region)으로 꽂을 자리를 정한다.
+    const point = resolveRegionPoint(course.region);
 
     // 지도 SVG 좌표(300 기준)를 실제 렌더 크기로 환산
     const w = wrap.offsetWidth;
@@ -352,7 +351,6 @@ export function DartThrowModal({ onClose }: { onClose: () => void }) {
               )}
               <span className="dt-tag">{result?.theme ?? "추천 코스"}</span>
               <div className="dt-name">{result?.title}</div>
-              <div className="dt-addr">📍 {result?.addr1}</div>
               {result?.overview && <div className="dt-desc">{result.overview}</div>}
               <div className="dt-meta">
                 {regionLabel && <span>{regionLabel}</span>}

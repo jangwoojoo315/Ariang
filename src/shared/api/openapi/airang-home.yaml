@@ -472,7 +472,7 @@ components:
       required:
         - contentId
         - title
-        - addr1
+        - region
         - imgUrl
         - overview
         - distance
@@ -486,9 +486,9 @@ components:
         title:
           type: string
           example: "가도 가도 또 가고 싶은 여행지의 스테디셀러"
-        addr1:
-          type: string
-          example: "강원특별자치도 속초시 영금정로 24"
+        region:
+          $ref: '#/components/schemas/Region'
+          example: "GANGWON"
         imgUrl:
           type: string
           nullable: true
