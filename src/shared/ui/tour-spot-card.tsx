@@ -18,6 +18,9 @@ export function TourSpotCard({ item, rank, fill, onClick }: Props) {
     { key: 'toilet', label: '화장실', Icon: IcoAccessible, ok: item.isToilet },
   ];
 
+  const subtitle =
+    (REGION_LABELS[item.region] ?? item.region) + (item.price ? ` · ${item.price}` : '');
+
   return (
     <div
       onClick={() => onClick?.(item)}
@@ -49,9 +52,15 @@ export function TourSpotCard({ item, rank, fill, onClick }: Props) {
         <div style={{ fontWeight: 700, fontSize: 14, marginBottom: 2, lineHeight: 1.35, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
           {item.name}
         </div>
-        <div style={{ fontSize: 11, color: 'var(--text2)', marginBottom: 8 }}>
-          {REGION_LABELS[item.region] ?? item.region}
-          {item.price ? ` · ${item.price}` : ''}
+        {/* 입장료 원문이 수백 자에 이르는 경우가 있어 한 줄로 자른다 */}
+        <div
+          title={subtitle}
+          style={{
+            fontSize: 11, color: 'var(--text2)', marginBottom: 8,
+            whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
+          }}
+        >
+          {subtitle}
         </div>
         <div style={{ display: 'flex', gap: 5, flexWrap: 'wrap' }}>
           {badges.map((b) => (
