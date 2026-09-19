@@ -25,6 +25,7 @@ export * from './searchResult';
 export * from './searchTourParams';
 export * from './successResponse';
 export * from './tourSpot';
+export * from './tourSpotDetail';
 export * from './updateAlarmSettingRequest';
 export * from './updateChecklistRequest';
 export * from './updateChildrenRequest';

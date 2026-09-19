@@ -181,6 +181,27 @@ paths:
               schema:
                 $ref: '#/components/schemas/SearchResult'
 
+  /api/search/{id}:
+    get:
+      summary: 관광지 상세 조회
+      operationId: getTourDetail
+      tags:
+        - Search
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: 관광지 id
+      responses:
+        '200':
+          description: 성공
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TourSpotDetail'
+
   /api/my-tour:
     get:
       summary: 내 여행 목록 조회
@@ -564,6 +585,65 @@ components:
           type: number
           format: double
           example: 126.9770
+
+    TourSpotDetail:
+      type: object
+      description: "관광지 상세 — 목록용 TourSpot에 주소·소개글이 더해진 형태"
+      required:
+        - id
+        - name
+        - region
+        - address
+        - imgUrl
+        - overview
+        - operatingHours
+        - price
+        - isStrollerRental
+        - isPark
+        - isToilet
+        - latitude
+        - longitude
+      properties:
+        id:
+          type: string
+          example: "4113288"
+        name:
+          type: string
+          example: "담빛체험학습장"
+        region:
+          $ref: '#/components/schemas/Region'
+          example: "JEONNAM"
+        address:
+          type: string
+          nullable: true
+          example: "전남 담양군 담양읍 메타세쿼이아로 146"
+        imgUrl:
+          type: string
+          nullable: true
+        overview:
+          type: string
+          nullable: true
+          description: "관광지 소개글 (HTML 태그가 섞여 올 수 있음)"
+        operatingHours:
+          type: string
+          nullable: true
+          example: "09:00~17:00"
+        price:
+          type: string
+          nullable: true
+          example: "무료"
+        isStrollerRental:
+          type: boolean
+        isPark:
+          type: boolean
+        isToilet:
+          type: boolean
+        latitude:
+          type: number
+          format: double
+        longitude:
+          type: number
+          format: double
 
     SearchResult:
       type: object

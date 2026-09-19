@@ -21,7 +21,8 @@ import type {
 
 import type {
   SearchResult,
-  SearchTourParams
+  SearchTourParams,
+  TourSpotDetail
 } from '../model';
 
 import { customInstance } from '../../mutator';
@@ -126,6 +127,98 @@ export function useSearchTour<TData = Awaited<ReturnType<typeof searchTour>>, TE
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getSearchTourQueryOptions(params,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+/**
+ * @summary 관광지 상세 조회
+ */
+export const getTourDetail = (
+    id: string,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<TourSpotDetail>(
+      {url: `/api/search/${id}`, method: 'GET', signal
+    },
+      );
+    }
+
+
+
+
+export const getGetTourDetailQueryKey = (id: string,) => {
+    return [
+    `/api/search/${id}`
+    ] as const;
+    }
+
+
+export const getGetTourDetailQueryOptions = <TData = Awaited<ReturnType<typeof getTourDetail>>, TError = unknown>(id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTourDetail>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetTourDetailQueryKey(id);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getTourDetail>>> = ({ signal }) => getTourDetail(id, signal);
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: id !== null && id !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getTourDetail>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetTourDetailQueryResult = NonNullable<Awaited<ReturnType<typeof getTourDetail>>>
+export type GetTourDetailQueryError = unknown
+
+
+export function useGetTourDetail<TData = Awaited<ReturnType<typeof getTourDetail>>, TError = unknown>(
+ id: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTourDetail>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getTourDetail>>,
+          TError,
+          Awaited<ReturnType<typeof getTourDetail>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetTourDetail<TData = Awaited<ReturnType<typeof getTourDetail>>, TError = unknown>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTourDetail>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getTourDetail>>,
+          TError,
+          Awaited<ReturnType<typeof getTourDetail>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetTourDetail<TData = Awaited<ReturnType<typeof getTourDetail>>, TError = unknown>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTourDetail>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary 관광지 상세 조회
+ */
+
+export function useGetTourDetail<TData = Awaited<ReturnType<typeof getTourDetail>>, TError = unknown>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTourDetail>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetTourDetailQueryOptions(id,options)
 
   const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
