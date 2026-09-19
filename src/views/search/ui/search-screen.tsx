@@ -33,6 +33,7 @@ const LABEL_TO_REGION: Record<string, Region> = Object.fromEntries(
 );
 
 const PAGE_SIZE = 20; // 페이지당 결과 수
+const MAX_REGIONS = 3; // 지역은 한 번에 3개까지만 선택
 
 interface Props {
   onSelectItem: (item: SpotOrFestival) => void;
@@ -487,28 +488,33 @@ function ToggleChip({
   Icon,
   label,
   active,
+  disabled,
   onClick,
 }: {
   Icon?: React.FC<{ size: number; color: string }>;
   label: string;
   active: boolean;
+  disabled?: boolean;
   onClick: () => void;
 }) {
   return (
     <button
       onClick={onClick}
+      disabled={disabled}
       style={{
         padding: "7px 13px",
         borderRadius: 20,
         fontSize: 13,
         fontWeight: 600,
         background: active ? "var(--primary)" : "var(--bg)",
-        color: active ? "#fff" : "var(--text2)",
+        color: active ? "#fff" : disabled ? "var(--text3)" : "var(--text2)",
         border: `1.5px solid ${active ? "var(--primary)" : "var(--border)"}`,
         transition: "all 0.15s",
         display: "flex",
         alignItems: "center",
         gap: 5,
+        opacity: disabled ? 0.45 : 1,
+        cursor: disabled ? "not-allowed" : "pointer",
       }}
     >
       {Icon && <Icon size={12} color={active ? "#fff" : "var(--text2)"} />}
@@ -521,7 +527,7 @@ function FilterSection({
   title,
   children,
 }: {
-  title: string;
+  title: React.ReactNode;
   children: React.ReactNode;
 }) {
   return (
@@ -594,12 +600,13 @@ function FilterSheet({
   const toggle = (key: keyof FilterState) =>
     setDraft((f) => ({ ...f, [key]: !f[key] }));
   const toggleArr = (key: "regions" | "groups" | "types", val: string) =>
-    setDraft((f) => ({
-      ...f,
-      [key]: (f[key] as string[]).includes(val)
-        ? (f[key] as string[]).filter((v) => v !== val)
-        : [...(f[key] as string[]), val],
-    }));
+    setDraft((f) => {
+      const cur = f[key] as string[];
+      if (cur.includes(val)) return { ...f, [key]: cur.filter((v) => v !== val) };
+      // 지역은 한 번에 3개까지만 (초과 선택은 무시)
+      if (key === "regions" && cur.length >= MAX_REGIONS) return f;
+      return { ...f, [key]: [...cur, val] };
+    });
   const clearFilters = () =>
     setDraft({
       regions: [],
@@ -610,7 +617,18 @@ function FilterSheet({
       parking: false,
       accessible: false,
     });
+  // 대분류만으로는 검색 조건이 되지 않으므로, 대분류와 무관하게
+  // 세부 분류가 1개 이상 있어야 하고 지역은 1~3개를 골라야 적용할 수 있다.
+  const needType = draft.types.length === 0;
+  const needRegion = draft.regions.length === 0;
+  const canApply = !needType && !needRegion;
+  const requireMessage = needType && needRegion
+    ? "관광지 종류와 지역을 선택해 주세요"
+    : needType
+      ? "관광지 종류를 1개 이상 선택해 주세요"
+      : "지역을 1개 이상 선택해 주세요";
   const apply = () => {
+    if (!canApply) return;
     onApply(draft);
     onClose();
   };
@@ -685,14 +703,18 @@ function FilterSheet({
             ))}
           </div>
         </FilterSection>
-        <FilterSection title="관광지 종류">
+        <FilterSection title="관광지 종류 (1개 이상)">
           <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
             {SPOT_TYPE_GROUPS.map((g) => {
               const isOpen = expandedGroup === g.key;
-              const isSelected = draft.groups.includes(g.key);
               const subTypes = Object.entries(SPOT_TYPES).filter(
                 ([, t]) => t.group === g.key,
               );
+              // 대분류만 눌러서는 검색 조건이 되지 않으므로,
+              // 세부 분류를 1개 이상 고른 대분류만 선택된 색으로 보여준다.
+              const isSelected =
+                draft.groups.includes(g.key) &&
+                subTypes.some(([key]) => draft.types.includes(key));
               return (
                 <div
                   key={g.key}
@@ -782,21 +804,34 @@ function FilterSheet({
             })}
           </div>
         </FilterSection>
-        <FilterSection title="지역">
+        <FilterSection title={`지역 (1~${MAX_REGIONS}개)`}>
           <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-            {REGIONS.map((r) => (
-              <ToggleChip
-                key={r}
-                label={r}
-                active={draft.regions.includes(r)}
-                onClick={() => toggleArr("regions", r)}
-              />
-            ))}
+            {REGIONS.map((r) => {
+              const active = draft.regions.includes(r);
+              // 3개를 채우면 더 고를 수 없다는 걸 칩 상태로 알린다
+              const reachedMax = !active && draft.regions.length >= MAX_REGIONS;
+              return (
+                <ToggleChip
+                  key={r}
+                  label={r}
+                  active={active}
+                  disabled={reachedMax}
+                  onClick={() => toggleArr("regions", r)}
+                />
+              );
+            })}
           </div>
         </FilterSection>
 
         <div style={{ paddingTop: 8, paddingBottom: 8 }}>
-          <PrimaryBtn onClick={apply}>적용하기</PrimaryBtn>
+          {!canApply && (
+            <div style={{ fontSize: 12, color: "var(--accent)", marginBottom: 8, textAlign: "center" }}>
+              {requireMessage}
+            </div>
+          )}
+          <div style={{ opacity: canApply ? 1 : 0.45, pointerEvents: canApply ? "auto" : "none" }}>
+            <PrimaryBtn onClick={apply}>적용하기</PrimaryBtn>
+          </div>
         </div>
       </div>
     </BottomSheet>
