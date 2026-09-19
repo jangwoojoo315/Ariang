@@ -92,7 +92,11 @@ export function SearchScreen({ onSelectItem }: Props) {
     return params;
   }, [query, filters, page]);
 
-  const { data, isLoading, isError } = useSearchTour(searchParams);
+  // 처음 진입했을 때(검색어·필터 모두 없음)는 요청하지 않고 안내만 보여준다
+  const hasCondition = query.trim().length > 0 || activeFilterCount > 0;
+  const { data, isLoading, isError } = useSearchTour(searchParams, {
+    query: { enabled: hasCondition },
+  });
 
   const totalPages = data?.totalPages ?? 0;
   const totalElements = data?.totalElements ?? 0;
@@ -200,11 +204,31 @@ export function SearchScreen({ onSelectItem }: Props) {
             fontWeight: 500,
           }}
         >
-          {isLoading
-            ? "검색 중…"
-            : `${totalElements}개의 관광지를 찾았어요`}
+          {!hasCondition
+            ? ""
+            : isLoading
+              ? "검색 중…"
+              : `${totalElements}개의 관광지를 찾았어요`}
         </div>
-        {isLoading ? (
+        {!hasCondition ? (
+          <div
+            style={{
+              textAlign: "center",
+              paddingTop: 60,
+              color: "var(--text2)",
+            }}
+          >
+            <div style={{ fontSize: 48, marginBottom: 12 }}>🔍</div>
+            <div style={{ fontWeight: 600, fontSize: 16, marginBottom: 6 }}>
+              어떤 곳을 찾으세요?
+            </div>
+            <div style={{ fontSize: 14, lineHeight: 1.7 }}>
+              관광지 이름을 검색하거나
+              <br />
+              [필터]에서 관광지 종류를 골라 보세요
+            </div>
+          </div>
+        ) : isLoading ? (
           <div
             style={{
               textAlign: "center",
