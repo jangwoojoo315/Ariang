@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { BottomSheet, Modal, PrimaryBtn, PlaceholderImg, KakaoMap } from '@/shared/ui';
 import { cleanTourText } from '@/shared/lib';
 import { IcoXClose, IcoCalendar, IcoCheck2, IcoStroller } from '@/shared/ui';
+import { useGetTourDetail } from '@/shared/api/generated/search/search';
 import type { SpotOrFestival } from '@/shared/types';
 
 function IconStroller({ size=22, color='currentColor' }: { size?:number; color?:string }) {
@@ -121,6 +122,9 @@ export function TripSaveModal({ item, onClose, onSave }: { item: SpotOrFestival;
 
 export function DetailSheet({ item, onClose, onSaveTrip }: { item: SpotOrFestival; onClose:()=>void; onSaveTrip:(item:SpotOrFestival,date:string,useRecommendedItems?:boolean)=>Promise<boolean> }) {
   const [showSave, setShowSave] = useState(false);
+  // 목록 응답(TourSpot)에는 소개글이 없어 상세 조회로 따로 받아온다.
+  const { data: detail, isLoading: isDetailLoading } = useGetTourDetail(item.id);
+  const overview = cleanTourText(detail?.overview);
 
   return (
     <>
@@ -146,7 +150,17 @@ export function DetailSheet({ item, onClose, onSaveTrip }: { item: SpotOrFestiva
         </div>
 
         <div style={{ padding:'18px 20px' }}>
-          <div style={{ fontSize:14, color:'var(--text)', lineHeight:1.75, marginBottom:18, whiteSpace:'pre-line' }}>{cleanTourText(item.description)}</div>
+          {(isDetailLoading || overview) && (
+            <div style={{ background:'var(--bg)', border:'1px solid var(--border)', borderRadius:14, padding:'14px 16px', marginBottom:18 }}>
+              {isDetailLoading ? (
+                [100, 96, 72].map((w, i) => (
+                  <div key={i} style={{ height:12, width:`${w}%`, borderRadius:6, background:'var(--border)', marginBottom: i === 2 ? 0 : 9, animation:'pulse 1.2s ease-in-out infinite' }} />
+                ))
+              ) : (
+                <div style={{ fontSize:13.5, color:'var(--text2)', lineHeight:1.8, whiteSpace:'pre-line' }}>{overview}</div>
+              )}
+            </div>
+          )}
 
           <div style={{ background:'linear-gradient(135deg, #E8F4ED 0%, #F0F7EC 100%)', border:'1.5px solid var(--border)', borderRadius:16, padding:16, marginBottom:18 }}>
             <div style={{ fontWeight:800, fontSize:13, color:'var(--primary)', marginBottom:12, display:'flex', alignItems:'center', gap:6 }}>
